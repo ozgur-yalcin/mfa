@@ -8,9 +8,9 @@ mfa *("multi-factor authentication")* is a command line tool for generating and 
   * [Examples](#examples)
     + [Generate code](#generate-code)
     + [Add account](#add-account)
-    + [List acccount](#list-acccount)
+    + [List account](#list-account)
     + [Remove accounts](#remove-accounts)
-    + [Update acccount](#update-acccount)
+    + [Update account](#update-account)
   * [License](#license)
 
 <!-- /TOC -->
@@ -92,7 +92,7 @@ Add an account, the account name is GitHub, the user name is ozgur-yalcin
 mfa add GitHub:ozgur-yalcin ADOO3MCCCVO5AVD6
 ```
 
-### List acccount
+### List account
 
 List all accounts
 
@@ -132,7 +132,7 @@ Delete accounts  whose account name is GitHub and whose username is ozgur-yalcin
 mfa remove GitHub ozgur-yalcin
 ```
 
-### Update acccount
+### Update account
 
 Update the secret key of accounts which account name is GitHub
 
