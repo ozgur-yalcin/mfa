@@ -16,7 +16,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-type otpView struct {
+type otpData struct {
 	accountName string
 	userName    string
 	code        string
@@ -97,12 +97,11 @@ func (c *listCommand) listAccounts(accountName string, userName string) error {
 		log.Fatalf("failed to connect database:%s", err.Error())
 	}
 	defer db.Close()
-
 	accounts, err := db.ListAccounts(accountName, userName)
 	if err != nil {
 		return err
 	}
-	var result []otpView
+	var result []otpData
 	if len(accounts) == 0 {
 		fmt.Println("no accounts found!")
 	} else {
@@ -115,7 +114,7 @@ func (c *listCommand) listAccounts(accountName string, userName string) error {
 				if err != nil {
 					log.Printf("%s %s generate code error%s\n", account.AccountName, account.Username, err)
 				} else {
-					result = append(result, otpView{
+					result = append(result, otpData{
 						accountName: account.AccountName,
 						userName:    account.Username,
 						code:        code,
