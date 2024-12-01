@@ -19,8 +19,8 @@ type Commander interface {
 }
 
 type Ancestor struct {
-	Command   Commander
-	Cmd       *cobra.Command
+	Commander Commander
+	Command   *cobra.Command
 	Root      *Ancestor
 	Parent    *Ancestor
 	ancestors []*Ancestor
@@ -60,7 +60,7 @@ func (c *Ancestor) init() error {
 	}
 	for i := len(ancestors) - 1; i >= 0; i-- {
 		cd := ancestors[i]
-		if err := cd.Command.PreRun(cd, c); err != nil {
+		if err := cd.Commander.PreRun(cd, c); err != nil {
 			return err
 		}
 	}
@@ -68,16 +68,16 @@ func (c *Ancestor) init() error {
 }
 
 func (c *Ancestor) compile() error {
-	c.Cmd = &cobra.Command{
-		Use: c.Command.Use(),
+	c.Command = &cobra.Command{
+		Use: c.Commander.Use(),
 		Args: func(cmd *cobra.Command, args []string) error {
-			if err := c.Command.Args(cmd.Context(), c, args); err != nil {
+			if err := c.Commander.Args(cmd.Context(), c, args); err != nil {
 				return err
 			}
 			return nil
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if err := c.Command.Run(cmd.Context(), c, args); err != nil {
+			if err := c.Commander.Run(cmd.Context(), c, args); err != nil {
 				return err
 			}
 			return nil
@@ -90,14 +90,14 @@ func (c *Ancestor) compile() error {
 		SilenceUsage:               false,
 		SuggestionsMinimumDistance: 2,
 	}
-	if err := c.Command.Init(c); err != nil {
+	if err := c.Commander.Init(c); err != nil {
 		return err
 	}
 	for _, cc := range c.ancestors {
 		if err := cc.compile(); err != nil {
 			return err
 		}
-		c.Cmd.AddCommand(cc.Cmd)
+		c.Command.AddCommand(cc.Command)
 	}
 	return nil
 }

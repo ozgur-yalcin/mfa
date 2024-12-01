@@ -38,21 +38,21 @@ func (c *listCommand) Use() string {
 }
 
 func (c *listCommand) Init(cd *Ancestor) error {
-	cmd := cd.Cmd
+	cmd := cd.Command
 	cmd.Short = "List all added accounts and password code"
 	cmd.Long = "List all added accounts and password code"
 	return nil
 }
 
 func (c *listCommand) Args(ctx context.Context, cd *Ancestor, args []string) error {
-	if err := cobra.RangeArgs(0, 2)(cd.Cmd, args); err != nil {
+	if err := cobra.RangeArgs(0, 2)(cd.Command, args); err != nil {
 		return err
 	}
 	return nil
 }
 
 func (c *listCommand) PreRun(cd, runner *Ancestor) error {
-	c.r = cd.Root.Command.(*rootCommand)
+	c.r = cd.Root.Commander.(*rootCommand)
 	return nil
 }
 

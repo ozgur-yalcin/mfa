@@ -28,8 +28,8 @@ func (c *simpleCommand) Use() string {
 }
 
 func (c *simpleCommand) Init(cd *Ancestor) error {
-	c.rootCmd = cd.Root.Command.(*rootCommand)
-	cmd := cd.Cmd
+	c.rootCmd = cd.Root.Commander.(*rootCommand)
+	cmd := cd.Command
 	cmd.Short = c.short
 	cmd.Long = c.long
 	if c.use != "" {

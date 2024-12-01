@@ -31,7 +31,7 @@ func (c *generateCommand) Use() string {
 }
 
 func (c *generateCommand) Init(cd *Ancestor) error {
-	cmd := cd.Cmd
+	cmd := cd.Command
 	cmd.Short = "Generate one-time password from secret key"
 	cmd.Long = "Generate one-time password from secret key"
 	cmd.Flags().StringVarP(&c.mode, "mode", "m", "totp", "use time-variant TOTP mode or use event-based HOTP mode")
@@ -45,7 +45,7 @@ func (c *generateCommand) Init(cd *Ancestor) error {
 }
 
 func (c *generateCommand) Args(ctx context.Context, cd *Ancestor, args []string) error {
-	if err := cobra.ExactArgs(1)(cd.Cmd, args); err != nil {
+	if err := cobra.ExactArgs(1)(cd.Command, args); err != nil {
 		return err
 	}
 	if c.mode != "hotp" && c.mode != "totp" {
@@ -55,12 +55,12 @@ func (c *generateCommand) Args(ctx context.Context, cd *Ancestor, args []string)
 }
 
 func (c *generateCommand) PreRun(cd, runner *Ancestor) error {
-	c.r = cd.Root.Command.(*rootCommand)
+	c.r = cd.Root.Commander.(*rootCommand)
 	return nil
 }
 
 func (c *generateCommand) Run(ctx context.Context, cd *Ancestor, args []string) (err error) {
-	if err := cobra.ExactArgs(1)(cd.Cmd, args); err != nil {
+	if err := cobra.ExactArgs(1)(cd.Command, args); err != nil {
 		return err
 	}
 	secretKey := args[0]

@@ -23,7 +23,7 @@ func (c *versionCommand) Use() string {
 }
 
 func (c *versionCommand) Init(cd *Ancestor) error {
-	cmd := cd.Cmd
+	cmd := cd.Command
 	cmd.Short = "show version"
 	cmd.Long = "show version"
 	return nil
@@ -34,7 +34,7 @@ func (c *versionCommand) Args(ctx context.Context, cd *Ancestor, args []string) 
 }
 
 func (c *versionCommand) PreRun(cd, runner *Ancestor) error {
-	c.r = cd.Root.Command.(*rootCommand)
+	c.r = cd.Root.Commander.(*rootCommand)
 	return nil
 }
 

@@ -36,7 +36,7 @@ func (c *addCommand) Use() string {
 }
 
 func (c *addCommand) Init(cd *Ancestor) error {
-	cmd := cd.Cmd
+	cmd := cd.Command
 	cmd.Short = "Add account and its secret key"
 	cmd.Long = "Add account and its secret key"
 	cmd.Flags().StringVarP(&c.mode, "mode", "m", "totp", "use time-variant TOTP mode or use event-based HOTP mode")
@@ -50,7 +50,7 @@ func (c *addCommand) Init(cd *Ancestor) error {
 }
 
 func (c *addCommand) Args(ctx context.Context, cd *Ancestor, args []string) error {
-	if err := cobra.ExactArgs(2)(cd.Cmd, args); err != nil {
+	if err := cobra.ExactArgs(2)(cd.Command, args); err != nil {
 		return err
 	}
 	if c.mode != "hotp" && c.mode != "totp" {
@@ -60,13 +60,13 @@ func (c *addCommand) Args(ctx context.Context, cd *Ancestor, args []string) erro
 }
 
 func (c *addCommand) PreRun(cd, runner *Ancestor) error {
-	c.r = cd.Root.Command.(*rootCommand)
+	c.r = cd.Root.Commander.(*rootCommand)
 	return nil
 }
 
 func (c *addCommand) Run(ctx context.Context, cd *Ancestor, args []string) (err error) {
 	initialize.Init()
-	if err = cobra.ExactArgs(2)(cd.Cmd, args); err != nil {
+	if err = cobra.ExactArgs(2)(cd.Command, args); err != nil {
 		return
 	}
 	accountName := args[0]

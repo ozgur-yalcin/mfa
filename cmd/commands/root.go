@@ -31,7 +31,7 @@ func (r *rootCommand) Use() string {
 }
 
 func (r *rootCommand) Init(cd *Ancestor) error {
-	cmd := cd.Cmd
+	cmd := cd.Command
 	cmd.Use = "mfa [flags]"
 	cmd.Short = "mfa generate OTP"
 	cmd.Long = "mfa is a command line tool for generating and validating one-time password."
@@ -48,7 +48,7 @@ func (r *rootCommand) PreRun(cd, runner *Ancestor) error {
 
 func (r *rootCommand) Run(ctx context.Context, cd *Ancestor, args []string) error {
 	slog.Debug(fmt.Sprintf("mfa version %q finishing with parameters %q", initialize.Version, os.Args))
-	return cd.Cmd.Usage()
+	return cd.Command.Usage()
 }
 
 func (r *rootCommand) Commands() []Commander {
@@ -59,8 +59,8 @@ func (r *Exec) Execute(ctx context.Context, args []string) (*Ancestor, error) {
 	if args == nil {
 		args = []string{}
 	}
-	r.c.Cmd.SetArgs(args)
-	cobraCommand, err := r.c.Cmd.ExecuteContextC(ctx)
+	r.c.Command.SetArgs(args)
+	cobraCommand, err := r.c.Command.ExecuteContextC(ctx)
 	var cd *Ancestor
 	if cobraCommand != nil {
 		if err == nil {
@@ -70,7 +70,7 @@ func (r *Exec) Execute(ctx context.Context, args []string) (*Ancestor, error) {
 		// Find the ancestor that was executed.
 		var find func(*cobra.Command, *Ancestor) *Ancestor
 		find = func(what *cobra.Command, in *Ancestor) *Ancestor {
-			if in.Cmd == what {
+			if in.Command == what {
 				return in
 			}
 			for _, in2 := range in.ancestors {
@@ -94,12 +94,12 @@ func Execute(args []string) error {
 	cd, err := x.Execute(context.Background(), args)
 	if err != nil {
 		if err == errHelp {
-			cd.Cmd.Help()
+			cd.Command.Help()
 			fmt.Println()
 			return nil
 		}
 		if IsCommandError(err) {
-			cd.Cmd.Help()
+			cd.Command.Help()
 			fmt.Println()
 		}
 	}
@@ -108,15 +108,15 @@ func Execute(args []string) error {
 
 func New(rootCmd Commander) (*Exec, error) {
 	rootCd := &Ancestor{
-		Command: rootCmd,
+		Commander: rootCmd,
 	}
 	rootCd.Root = rootCd
 	var addCommands func(cd *Ancestor, cmd Commander)
 	addCommands = func(cd *Ancestor, cmd Commander) {
 		cd2 := &Ancestor{
-			Root:    rootCd,
-			Parent:  cd,
-			Command: cmd,
+			Root:      rootCd,
+			Parent:    cd,
+			Commander: cmd,
 		}
 		cd.ancestors = append(cd.ancestors, cd2)
 		for _, c := range cmd.Commands() {

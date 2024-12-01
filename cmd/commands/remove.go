@@ -27,21 +27,21 @@ func (c *removeCommand) Use() string {
 }
 
 func (c *removeCommand) Init(cd *Ancestor) error {
-	cmd := cd.Cmd
+	cmd := cd.Command
 	cmd.Short = "Remove account and its secret key"
 	cmd.Long = "Remove account and its secret key"
 	return nil
 }
 
 func (c *removeCommand) Args(ctx context.Context, cd *Ancestor, args []string) error {
-	if err := cobra.RangeArgs(1, 2)(cd.Cmd, args); err != nil {
+	if err := cobra.RangeArgs(1, 2)(cd.Command, args); err != nil {
 		return err
 	}
 	return nil
 }
 
 func (c *removeCommand) PreRun(cd, runner *Ancestor) error {
-	c.r = cd.Root.Command.(*rootCommand)
+	c.r = cd.Root.Commander.(*rootCommand)
 	return nil
 }
 
