@@ -4,7 +4,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/ozgur-yalcin/mfa/cmd/commands"
+	"github.com/ozgur-yalcin/mfa/commands"
 )
 
 func main() {
