@@ -7,7 +7,7 @@ import (
 	"github.com/ozgur-yalcin/mfa/internal/models"
 )
 
-func InitDB() {
+func DB() {
 	db, err := database.LoadDatabase()
 	if err != nil {
 		log.Fatalf("failed to initialze database:%s", err.Error())

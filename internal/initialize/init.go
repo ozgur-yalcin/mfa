@@ -1,5 +1,5 @@
 package initialize
 
 func Init() {
-	InitDB()
+	DB()
 }
