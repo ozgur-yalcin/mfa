@@ -148,4 +148,4 @@ mfa update GitHub:ozgur-yalcin 5BRSSSBJUWBQBOXE
 
 ## License
 
-MIT License, see [LICENSE.md](LICENSE.md).
+MIT License, see [license.md](license.md).
