@@ -34,7 +34,7 @@ func (c *updateCommand) Use() string {
 	return c.use
 }
 
-func (c *updateCommand) Init(cd *Commandeer) error {
+func (c *updateCommand) Init(cd *Ancestor) error {
 	cmd := cd.Cmd
 	cmd.Short = "Add account and its secret key"
 	cmd.Long = "Add account and its secret key"
@@ -48,7 +48,7 @@ func (c *updateCommand) Init(cd *Commandeer) error {
 	return nil
 }
 
-func (c *updateCommand) Args(ctx context.Context, cd *Commandeer, args []string) error {
+func (c *updateCommand) Args(ctx context.Context, cd *Ancestor, args []string) error {
 	if err := cobra.ExactArgs(2)(cd.Cmd, args); err != nil {
 		return err
 	}
@@ -58,12 +58,12 @@ func (c *updateCommand) Args(ctx context.Context, cd *Commandeer, args []string)
 	return nil
 }
 
-func (c *updateCommand) PreRun(cd, runner *Commandeer) error {
+func (c *updateCommand) PreRun(cd, runner *Ancestor) error {
 	c.r = cd.Root.Command.(*rootCommand)
 	return nil
 }
 
-func (c *updateCommand) Run(ctx context.Context, cd *Commandeer, args []string) error {
+func (c *updateCommand) Run(ctx context.Context, cd *Ancestor, args []string) error {
 	initialize.Init()
 	if err := cobra.ExactArgs(2)(cd.Cmd, args); err != nil {
 		return err

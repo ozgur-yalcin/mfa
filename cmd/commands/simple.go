@@ -11,10 +11,10 @@ type simpleCommand struct {
 	name     string
 	short    string
 	long     string
-	args     func(ctx context.Context, cd *Commandeer, rootCmd *rootCommand, args []string) error
-	run      func(ctx context.Context, cd *Commandeer, rootCmd *rootCommand, args []string) error
+	args     func(ctx context.Context, cd *Ancestor, rootCmd *rootCommand, args []string) error
+	run      func(ctx context.Context, cd *Ancestor, rootCmd *rootCommand, args []string) error
 	withc    func(cmd *cobra.Command, r *rootCommand)
-	initc    func(cd *Commandeer) error
+	initc    func(cd *Ancestor) error
 	commands []Commander
 	rootCmd  *rootCommand
 }
@@ -27,7 +27,7 @@ func (c *simpleCommand) Use() string {
 	return c.use
 }
 
-func (c *simpleCommand) Init(cd *Commandeer) error {
+func (c *simpleCommand) Init(cd *Ancestor) error {
 	c.rootCmd = cd.Root.Command.(*rootCommand)
 	cmd := cd.Cmd
 	cmd.Short = c.short
@@ -41,21 +41,21 @@ func (c *simpleCommand) Init(cd *Commandeer) error {
 	return nil
 }
 
-func (c *simpleCommand) Args(ctx context.Context, cd *Commandeer, args []string) error {
+func (c *simpleCommand) Args(ctx context.Context, cd *Ancestor, args []string) error {
 	if c.args == nil {
 		return nil
 	}
 	return c.args(ctx, cd, c.rootCmd, args)
 }
 
-func (c *simpleCommand) PreRun(cd, runner *Commandeer) error {
+func (c *simpleCommand) PreRun(cd, runner *Ancestor) error {
 	if c.initc != nil {
 		return c.initc(cd)
 	}
 	return nil
 }
 
-func (c *simpleCommand) Run(ctx context.Context, cd *Commandeer, args []string) error {
+func (c *simpleCommand) Run(ctx context.Context, cd *Ancestor, args []string) error {
 	if c.run == nil {
 		return nil
 	}

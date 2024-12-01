@@ -11,23 +11,23 @@ import (
 type Commander interface {
 	Name() string
 	Use() string
-	Init(*Commandeer) error
-	Args(ctx context.Context, cd *Commandeer, args []string) error
-	PreRun(this, runner *Commandeer) error
-	Run(ctx context.Context, cd *Commandeer, args []string) error
+	Init(*Ancestor) error
+	Args(ctx context.Context, cd *Ancestor, args []string) error
+	PreRun(this, runner *Ancestor) error
+	Run(ctx context.Context, cd *Ancestor, args []string) error
 	Commands() []Commander
 }
 
-type Commandeer struct {
-	Command     Commander
-	Cmd         *cobra.Command
-	Root        *Commandeer
-	Parent      *Commandeer
-	commandeers []*Commandeer
+type Ancestor struct {
+	Command   Commander
+	Cmd       *cobra.Command
+	Root      *Ancestor
+	Parent    *Ancestor
+	ancestors []*Ancestor
 }
 
 type Exec struct {
-	c *Commandeer
+	c *Ancestor
 }
 
 func checkArgs(cmd *cobra.Command, args []string) error {
@@ -49,8 +49,8 @@ func checkArgs(cmd *cobra.Command, args []string) error {
 	}
 	return fmt.Errorf("unknown command %q for %q%s", args[0], cmd.CommandPath(), findSuggestions(cmd, commandName))
 }
-func (c *Commandeer) init() error {
-	var ancestors []*Commandeer
+func (c *Ancestor) init() error {
+	var ancestors []*Ancestor
 	{
 		cd := c
 		for cd != nil {
@@ -67,7 +67,7 @@ func (c *Commandeer) init() error {
 	return nil
 }
 
-func (c *Commandeer) compile() error {
+func (c *Ancestor) compile() error {
 	c.Cmd = &cobra.Command{
 		Use: c.Command.Use(),
 		Args: func(cmd *cobra.Command, args []string) error {
@@ -93,7 +93,7 @@ func (c *Commandeer) compile() error {
 	if err := c.Command.Init(c); err != nil {
 		return err
 	}
-	for _, cc := range c.commandeers {
+	for _, cc := range c.ancestors {
 		if err := cc.compile(); err != nil {
 			return err
 		}

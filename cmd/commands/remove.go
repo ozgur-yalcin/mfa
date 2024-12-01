@@ -26,26 +26,26 @@ func (c *removeCommand) Use() string {
 	return c.use
 }
 
-func (c *removeCommand) Init(cd *Commandeer) error {
+func (c *removeCommand) Init(cd *Ancestor) error {
 	cmd := cd.Cmd
 	cmd.Short = "Remove account and its secret key"
 	cmd.Long = "Remove account and its secret key"
 	return nil
 }
 
-func (c *removeCommand) Args(ctx context.Context, cd *Commandeer, args []string) error {
+func (c *removeCommand) Args(ctx context.Context, cd *Ancestor, args []string) error {
 	if err := cobra.RangeArgs(1, 2)(cd.Cmd, args); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (c *removeCommand) PreRun(cd, runner *Commandeer) error {
+func (c *removeCommand) PreRun(cd, runner *Ancestor) error {
 	c.r = cd.Root.Command.(*rootCommand)
 	return nil
 }
 
-func (c *removeCommand) Run(ctx context.Context, cd *Commandeer, args []string) error {
+func (c *removeCommand) Run(ctx context.Context, cd *Ancestor, args []string) error {
 	initialize.Init()
 	accountName, userName := args[0], ""
 	if len(args) == 1 {

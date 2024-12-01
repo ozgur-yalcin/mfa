@@ -30,7 +30,7 @@ func (r *rootCommand) Use() string {
 	return r.use
 }
 
-func (r *rootCommand) Init(cd *Commandeer) error {
+func (r *rootCommand) Init(cd *Ancestor) error {
 	cmd := cd.Cmd
 	cmd.Use = "mfa [flags]"
 	cmd.Short = "mfa generate OTP"
@@ -38,15 +38,15 @@ func (r *rootCommand) Init(cd *Commandeer) error {
 	return nil
 }
 
-func (r *rootCommand) Args(ctx context.Context, cd *Commandeer, args []string) error {
+func (r *rootCommand) Args(ctx context.Context, cd *Ancestor, args []string) error {
 	return nil
 }
 
-func (r *rootCommand) PreRun(cd, runner *Commandeer) error {
+func (r *rootCommand) PreRun(cd, runner *Ancestor) error {
 	return nil
 }
 
-func (r *rootCommand) Run(ctx context.Context, cd *Commandeer, args []string) error {
+func (r *rootCommand) Run(ctx context.Context, cd *Ancestor, args []string) error {
 	slog.Debug(fmt.Sprintf("mfa version %q finishing with parameters %q", initialize.Version, os.Args))
 	return cd.Cmd.Usage()
 }
@@ -55,25 +55,25 @@ func (r *rootCommand) Commands() []Commander {
 	return r.commands
 }
 
-func (r *Exec) Execute(ctx context.Context, args []string) (*Commandeer, error) {
+func (r *Exec) Execute(ctx context.Context, args []string) (*Ancestor, error) {
 	if args == nil {
 		args = []string{}
 	}
 	r.c.Cmd.SetArgs(args)
 	cobraCommand, err := r.c.Cmd.ExecuteContextC(ctx)
-	var cd *Commandeer
+	var cd *Ancestor
 	if cobraCommand != nil {
 		if err == nil {
 			err = checkArgs(cobraCommand, args)
 		}
 
-		// Find the commandeer that was executed.
-		var find func(*cobra.Command, *Commandeer) *Commandeer
-		find = func(what *cobra.Command, in *Commandeer) *Commandeer {
+		// Find the ancestor that was executed.
+		var find func(*cobra.Command, *Ancestor) *Ancestor
+		find = func(what *cobra.Command, in *Ancestor) *Ancestor {
 			if in.Cmd == what {
 				return in
 			}
-			for _, in2 := range in.commandeers {
+			for _, in2 := range in.ancestors {
 				if found := find(what, in2); found != nil {
 					return found
 				}
@@ -107,18 +107,18 @@ func Execute(args []string) error {
 }
 
 func New(rootCmd Commander) (*Exec, error) {
-	rootCd := &Commandeer{
+	rootCd := &Ancestor{
 		Command: rootCmd,
 	}
 	rootCd.Root = rootCd
-	var addCommands func(cd *Commandeer, cmd Commander)
-	addCommands = func(cd *Commandeer, cmd Commander) {
-		cd2 := &Commandeer{
+	var addCommands func(cd *Ancestor, cmd Commander)
+	addCommands = func(cd *Ancestor, cmd Commander) {
+		cd2 := &Ancestor{
 			Root:    rootCd,
 			Parent:  cd,
 			Command: cmd,
 		}
-		cd.commandeers = append(cd.commandeers, cd2)
+		cd.ancestors = append(cd.ancestors, cd2)
 		for _, c := range cmd.Commands() {
 			addCommands(cd2, c)
 		}

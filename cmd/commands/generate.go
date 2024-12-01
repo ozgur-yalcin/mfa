@@ -30,7 +30,7 @@ func (c *generateCommand) Use() string {
 	return c.use
 }
 
-func (c *generateCommand) Init(cd *Commandeer) error {
+func (c *generateCommand) Init(cd *Ancestor) error {
 	cmd := cd.Cmd
 	cmd.Short = "Generate one-time password from secret key"
 	cmd.Long = "Generate one-time password from secret key"
@@ -44,7 +44,7 @@ func (c *generateCommand) Init(cd *Commandeer) error {
 	return nil
 }
 
-func (c *generateCommand) Args(ctx context.Context, cd *Commandeer, args []string) error {
+func (c *generateCommand) Args(ctx context.Context, cd *Ancestor, args []string) error {
 	if err := cobra.ExactArgs(1)(cd.Cmd, args); err != nil {
 		return err
 	}
@@ -54,12 +54,12 @@ func (c *generateCommand) Args(ctx context.Context, cd *Commandeer, args []strin
 	return nil
 }
 
-func (c *generateCommand) PreRun(cd, runner *Commandeer) error {
+func (c *generateCommand) PreRun(cd, runner *Ancestor) error {
 	c.r = cd.Root.Command.(*rootCommand)
 	return nil
 }
 
-func (c *generateCommand) Run(ctx context.Context, cd *Commandeer, args []string) (err error) {
+func (c *generateCommand) Run(ctx context.Context, cd *Ancestor, args []string) (err error) {
 	if err := cobra.ExactArgs(1)(cd.Cmd, args); err != nil {
 		return err
 	}

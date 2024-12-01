@@ -37,26 +37,26 @@ func (c *listCommand) Use() string {
 	return c.use
 }
 
-func (c *listCommand) Init(cd *Commandeer) error {
+func (c *listCommand) Init(cd *Ancestor) error {
 	cmd := cd.Cmd
 	cmd.Short = "List all added accounts and password code"
 	cmd.Long = "List all added accounts and password code"
 	return nil
 }
 
-func (c *listCommand) Args(ctx context.Context, cd *Commandeer, args []string) error {
+func (c *listCommand) Args(ctx context.Context, cd *Ancestor, args []string) error {
 	if err := cobra.RangeArgs(0, 2)(cd.Cmd, args); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (c *listCommand) PreRun(cd, runner *Commandeer) error {
+func (c *listCommand) PreRun(cd, runner *Ancestor) error {
 	c.r = cd.Root.Command.(*rootCommand)
 	return nil
 }
 
-func (c *listCommand) Run(ctx context.Context, cd *Commandeer, args []string) error {
+func (c *listCommand) Run(ctx context.Context, cd *Ancestor, args []string) error {
 	initialize.Init()
 	var accountName, userName string
 	if len(args) == 1 {

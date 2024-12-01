@@ -22,23 +22,23 @@ func (c *versionCommand) Use() string {
 	return c.use
 }
 
-func (c *versionCommand) Init(cd *Commandeer) error {
+func (c *versionCommand) Init(cd *Ancestor) error {
 	cmd := cd.Cmd
 	cmd.Short = "show version"
 	cmd.Long = "show version"
 	return nil
 }
 
-func (c *versionCommand) Args(ctx context.Context, cd *Commandeer, args []string) error {
+func (c *versionCommand) Args(ctx context.Context, cd *Ancestor, args []string) error {
 	return nil
 }
 
-func (c *versionCommand) PreRun(cd, runner *Commandeer) error {
+func (c *versionCommand) PreRun(cd, runner *Ancestor) error {
 	c.r = cd.Root.Command.(*rootCommand)
 	return nil
 }
 
-func (c *versionCommand) Run(ctx context.Context, cd *Commandeer, args []string) error {
+func (c *versionCommand) Run(ctx context.Context, cd *Ancestor, args []string) error {
 	c.ShowVersion()
 	return nil
 }
