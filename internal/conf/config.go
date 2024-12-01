@@ -14,7 +14,7 @@ const (
 )
 
 func DefaultConfig() *Config {
-	return &Config{
-		DatabaseBackend: backend2.NewSqlite(fs.MakeFilenamePath(sqliteFileName)),
-	}
+	path := fs.MakeFilenamePath(sqliteFileName)
+	//fmt.Println(path)
+	return &Config{DatabaseBackend: backend2.NewSqlite(path)}
 }
