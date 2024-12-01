@@ -1,8 +1,9 @@
 package conf
 
 import (
+	"path"
+
 	"github.com/ozgur-yalcin/mfa/internal/backend"
-	"github.com/ozgur-yalcin/mfa/internal/fs"
 )
 
 type Config struct {
@@ -14,7 +15,6 @@ const (
 )
 
 func DefaultConfig() *Config {
-	path := fs.MakeFilenamePath(sqliteFileName)
-	//fmt.Println(path)
+	path := path.Join(".", sqliteFileName)
 	return &Config{DatabaseBackend: backend.NewSqlite(path)}
 }
