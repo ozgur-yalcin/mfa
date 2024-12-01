@@ -5,7 +5,7 @@ import (
 	"sync"
 
 	"github.com/ozgur-yalcin/mfa/internal/backend"
-	"github.com/ozgur-yalcin/mfa/internal/conf"
+	"github.com/ozgur-yalcin/mfa/internal/config"
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"
@@ -50,7 +50,7 @@ func (db *Database) Close() error {
 }
 
 func LoadDatabase() (*Database, error) {
-	return &Database{backend: conf.DefaultConfig().DatabaseBackend}, nil
+	return &Database{backend: config.DefaultConfig().DatabaseBackend}, nil
 }
 
 func (db *Database) Engine() string {
