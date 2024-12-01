@@ -130,7 +130,7 @@ func (c *listCommand) listAccounts(accountName string, userName string) error {
 		writer := tabwriter.NewWriter(os.Stdout, 8, 8, 1, '\t', 0)
 		fmt.Fprintf(writer, "%s\t%s\t%s\t%s\n", "", "Account name", "User name", "Code")
 		for i, item := range result {
-			_, err := fmt.Fprintf(writer, "%d\t%s\t%s\t%s\n", i, item.accountName, item.userName, item.code)
+			_, err := fmt.Fprintf(writer, "%d\t%s\t%s\t%s\n", i+1, item.accountName, item.userName, item.code)
 			if err != nil {
 				log.Printf(err.Error())
 			}
