@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"context"
-	"errors"
 	"flag"
 	"fmt"
 	"log"
@@ -51,9 +50,6 @@ func (c *listCommand) Run(ctx context.Context, cd *Ancestor, args []string) (err
 		user = pairs[1]
 	} else {
 		issuer = c.fs.Arg(0)
-	}
-	if issuer == "" {
-		return errors.New("issuer cannot be empty")
 	}
 	if err := c.listAccounts(issuer, user); err != nil {
 		return err
