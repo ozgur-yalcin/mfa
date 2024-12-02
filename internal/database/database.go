@@ -6,7 +6,6 @@ import (
 
 	"github.com/ozgur-yalcin/mfa/internal/backend"
 	"github.com/ozgur-yalcin/mfa/internal/config"
-	"gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -25,9 +24,6 @@ func (db *Database) Open() error {
 	case "sqlite":
 		params := db.backend.Params()
 		conn, err = gorm.Open(sqlite.Open(params), &gorm.Config{})
-	case "mysql":
-		params := db.backend.Params()
-		conn, err = gorm.Open(mysql.Open(params), &gorm.Config{})
 	case "postgresql":
 		params := db.backend.Params()
 		conn, err = gorm.Open(postgres.Open(params), &gorm.Config{})
@@ -58,11 +54,5 @@ func (db *Database) Engine() string {
 }
 
 func (db *Database) AutoMigrate(dst ...interface{}) error {
-	var err error
-	if db.Engine() == "mysql" {
-		err = db.db.Set("gorm:table_options", "ENGINE=InnoDB CHARSET=utf8mb4").AutoMigrate(dst...)
-	} else {
-		err = db.db.AutoMigrate(dst...)
-	}
-	return err
+	return db.db.AutoMigrate(dst...)
 }
