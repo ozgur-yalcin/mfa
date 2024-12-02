@@ -55,7 +55,13 @@ mfa gen -m hotp -c 1 ADOO3MCCCVO5AVD6
 
 ### Create account
 
-Create an issuerd GitHub
+Create an account by qr code
+
+```
+mfa qr image.png
+```
+
+Create an account GitHub
 
 ```
 mfa add GitHub ADOO3MCCCVO5AVD6
