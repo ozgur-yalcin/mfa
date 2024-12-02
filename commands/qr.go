@@ -83,12 +83,7 @@ func (c *qrCommand) Run(ctx context.Context, cd *Ancestor, args []string) error 
 	if u.Scheme != "otpauth" {
 		return errors.New("invalid scheme")
 	}
-	account := &models.Account{}
-	account.Mode = c.mode
-	account.Hash = c.hash
-	account.Digits = c.digits
-	account.Period = c.period
-	account.Counter = c.counter
+	account := &models.Account{Mode: c.mode, Hash: c.hash, Digits: c.digits, Period: c.period, Counter: c.counter}
 	if host := u.Hostname(); host != "" {
 		account.Mode = host
 	}
@@ -118,7 +113,7 @@ func (c *qrCommand) Run(ctx context.Context, cd *Ancestor, args []string) error 
 	if counter := u.Query().Get("counter"); counter != "" && account.Mode == "hotp" {
 		fmt.Sscanf(counter, "%d", &account.Counter)
 	}
-	if err := c.saveAccount(account.Issuer, account.User, account.Secret, account.Mode, account.Hash, account.Digits, account.Period, account.Counter); err != nil {
+	if err := c.saveAccount(account); err != nil {
 		log.Fatal(err)
 	}
 	log.Println("account added successfully")
@@ -149,7 +144,7 @@ func (c *qrCommand) readQRCode(path string) (*gozxing.Result, error) {
 	return result, nil
 }
 
-func (c *qrCommand) saveAccount(issuer string, user string, secret string, mode string, hash string, digits int, period int64, counter int64) error {
+func (c *qrCommand) saveAccount(account *models.Account) error {
 	db, err := database.LoadDatabase()
 	if err != nil {
 		log.Fatal(err)
@@ -158,23 +153,13 @@ func (c *qrCommand) saveAccount(issuer string, user string, secret string, mode 
 		log.Fatal(err)
 	}
 	defer db.Close()
-	accounts, err := db.ListAccounts(issuer, user)
+	accounts, err := db.ListAccounts(account.Issuer, account.User)
 	if err != nil {
 		log.Fatal(err)
 	}
 	if len(accounts) > 0 {
 		log.Fatal("account already exists")
 	} else if len(accounts) == 0 {
-		account := &models.Account{
-			Issuer:  issuer,
-			User:    user,
-			Secret:  secret,
-			Mode:    mode,
-			Hash:    hash,
-			Digits:  digits,
-			Period:  period,
-			Counter: counter,
-		}
 		return db.CreateAccount(account)
 	}
 	return nil
