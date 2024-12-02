@@ -23,12 +23,6 @@ type listCommand struct {
 	name     string
 }
 
-type otpData struct {
-	accountName string
-	userName    string
-	code        string
-}
-
 func newListCommand() *listCommand {
 	return &listCommand{name: "list"}
 }
@@ -82,7 +76,12 @@ func (c *listCommand) listAccounts(accountName string, userName string) error {
 	if err != nil {
 		log.Fatal(err)
 	}
-	var result []otpData
+	type otp struct {
+		accountName string
+		userName    string
+		code        string
+	}
+	var otps []otp
 	if len(accounts) == 0 {
 		log.Println("no accounts found!")
 	} else {
@@ -95,7 +94,7 @@ func (c *listCommand) listAccounts(accountName string, userName string) error {
 				if err != nil {
 					log.Printf("%s %s generate code error%s\n", account.AccountName, account.Username, err)
 				} else {
-					result = append(result, otpData{
+					otps = append(otps, otp{
 						accountName: account.AccountName,
 						userName:    account.Username,
 						code:        code,
@@ -104,12 +103,12 @@ func (c *listCommand) listAccounts(accountName string, userName string) error {
 			}(account)
 		}
 		wg.Wait()
-		sort.Slice(result, func(i, j int) bool {
-			return result[i].accountName < result[j].accountName
+		sort.Slice(otps, func(i, j int) bool {
+			return otps[i].accountName < otps[j].accountName
 		})
 		writer := tabwriter.NewWriter(os.Stdout, 8, 8, 1, '\t', 0)
 		fmt.Fprintf(writer, "%s\t%s\t%s\t%s\n", "", "Account name", "User name", "Code")
-		for i, item := range result {
+		for i, item := range otps {
 			_, err := fmt.Fprintf(writer, "%d\t%s\t%s\t%s\n", i+1, item.accountName, item.userName, item.code)
 			if err != nil {
 				log.Printf(err.Error())
