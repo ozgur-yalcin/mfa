@@ -5,13 +5,19 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"image/jpeg"
-	"image/png"
+	"image"
 	"log"
 	"net/url"
 	"os"
-	"path/filepath"
 	"strings"
+
+	_ "image/gif"
+	_ "image/jpeg"
+	_ "image/png"
+
+	_ "golang.org/x/image/bmp"
+	_ "golang.org/x/image/tiff"
+	_ "golang.org/x/image/webp"
 
 	"github.com/makiuchi-d/gozxing"
 	"github.com/makiuchi-d/gozxing/qrcode"
@@ -124,30 +130,18 @@ func (c *qrCommand) readQRCode(path string) (*gozxing.Result, error) {
 		return nil, err
 	}
 	defer file.Close()
-	var img gozxing.LuminanceSource
-	ext := strings.ToLower(filepath.Ext(path))
-	switch ext {
-	case ".jpg", ".jpeg":
-		img_obj, err := jpeg.Decode(file)
-		if err != nil {
-			return nil, err
-		}
-		img = gozxing.NewLuminanceSourceFromImage(img_obj)
-	case ".png":
-		img_obj, err := png.Decode(file)
-		if err != nil {
-			return nil, err
-		}
-		img = gozxing.NewLuminanceSourceFromImage(img_obj)
-	default:
-		return nil, errors.New("unsupported image format")
+	img, _, err := image.Decode(file)
+	if err != nil {
+		return nil, err
 	}
-	bmp, err := gozxing.NewBinaryBitmap(gozxing.NewHybridBinarizer(img))
+	source := gozxing.NewLuminanceSourceFromImage(img)
+	binary := gozxing.NewHybridBinarizer(source)
+	bitmap, err := gozxing.NewBinaryBitmap(binary)
 	if err != nil {
 		return nil, err
 	}
 	reader := qrcode.NewQRCodeReader()
-	result, err := reader.Decode(bmp, nil)
+	result, err := reader.Decode(bitmap, nil)
 	if err != nil {
 		return nil, err
 	}
