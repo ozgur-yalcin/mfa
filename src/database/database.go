@@ -2,7 +2,6 @@ package database
 
 import (
 	"errors"
-	"sync"
 
 	"github.com/ozgur-yalcin/mfa/src/backend"
 	"github.com/ozgur-yalcin/mfa/src/config"
@@ -13,7 +12,6 @@ import (
 
 type Database struct {
 	db      *gorm.DB
-	dbLock  sync.Mutex
 	backend backend.Backend
 }
 
