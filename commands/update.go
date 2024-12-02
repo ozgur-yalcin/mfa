@@ -14,10 +14,9 @@ import (
 
 type updateCommand struct {
 	r           *rootCommand
-	name        string
-	use         string
-	commands    []Commander
 	fs          *flag.FlagSet
+	commands    []Commander
+	name        string
 	mode        string
 	base32      bool
 	hash        string
@@ -29,10 +28,6 @@ type updateCommand struct {
 
 func (c *updateCommand) Name() string {
 	return c.name
-}
-
-func (c *updateCommand) Use() string {
-	return c.use
 }
 
 func (c *updateCommand) Init(cd *Ancestor) error {
@@ -83,10 +78,7 @@ func (c *updateCommand) Commands() []Commander {
 }
 
 func newUpdateCommand() *updateCommand {
-	return &updateCommand{
-		name: "update",
-		use:  "update [flags] <account name> <secret key>",
-	}
+	return &updateCommand{name: "update"}
 }
 
 func (c *updateCommand) generateCode(secretKey string) (code string, err error) {

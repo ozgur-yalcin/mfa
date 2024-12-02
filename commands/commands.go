@@ -7,7 +7,6 @@ import (
 
 type Commander interface {
 	Name() string
-	Use() string
 	Init(*Ancestor) error
 	Run(ctx context.Context, cd *Ancestor, args []string) error
 	Commands() []Commander
@@ -53,7 +52,6 @@ func (c *Ancestor) compile() error {
 func newExec() (*Exec, error) {
 	rootCmd := &rootCommand{
 		name: "mfa",
-		use:  "mfa <subcommand> [flags] [args]",
 		commands: []Commander{
 			newVersionCommand(),
 			newGenerateCommand(),

@@ -12,18 +12,13 @@ import (
 
 type removeCommand struct {
 	r        *rootCommand
-	name     string
-	use      string
-	commands []Commander
 	fs       *flag.FlagSet
+	commands []Commander
+	name     string
 }
 
 func (c *removeCommand) Name() string {
 	return c.name
-}
-
-func (c *removeCommand) Use() string {
-	return c.use
 }
 
 func (c *removeCommand) Init(cd *Ancestor) error {
@@ -58,10 +53,7 @@ func (c *removeCommand) Commands() []Commander {
 }
 
 func newRemoveCommand() *removeCommand {
-	return &removeCommand{
-		name: "remove",
-		use:  "remove <account name> [user name]",
-	}
+	return &removeCommand{name: "remove"}
 }
 
 func (c *removeCommand) removeAccount(accountName string, userName string) error {

@@ -11,18 +11,13 @@ import (
 )
 
 type rootCommand struct {
-	name     string
-	use      string
-	commands []Commander
 	fs       *flag.FlagSet
+	commands []Commander
+	name     string
 }
 
 func (r *rootCommand) Name() string {
 	return r.name
-}
-
-func (r *rootCommand) Use() string {
-	return r.use
 }
 
 func (r *rootCommand) Init(cd *Ancestor) error {

@@ -11,10 +11,9 @@ import (
 
 type generateCommand struct {
 	r           *rootCommand
-	name        string
-	use         string
-	commands    []Commander
 	fs          *flag.FlagSet
+	commands    []Commander
+	name        string
 	mode        string
 	base32      bool
 	hash        string
@@ -26,10 +25,6 @@ type generateCommand struct {
 
 func (c *generateCommand) Name() string {
 	return c.name
-}
-
-func (c *generateCommand) Use() string {
-	return c.use
 }
 
 func (c *generateCommand) Init(cd *Ancestor) error {
@@ -85,9 +80,6 @@ func (c *generateCommand) Commands() []Commander {
 }
 
 func newGenerateCommand() *generateCommand {
-	generateCmd := &generateCommand{
-		name: "generate",
-		use:  "generate [flags] <secret key>",
-	}
+	generateCmd := &generateCommand{name: "generate"}
 	return generateCmd
 }

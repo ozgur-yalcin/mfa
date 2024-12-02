@@ -24,18 +24,13 @@ type otpData struct {
 
 type listCommand struct {
 	r        *rootCommand
-	name     string
-	use      string
-	commands []Commander
 	fs       *flag.FlagSet
+	commands []Commander
+	name     string
 }
 
 func (c *listCommand) Name() string {
 	return c.name
-}
-
-func (c *listCommand) Use() string {
-	return c.use
 }
 
 func (c *listCommand) Init(cd *Ancestor) error {
@@ -71,10 +66,7 @@ func (c *listCommand) Commands() []Commander {
 }
 
 func newListCommand() *listCommand {
-	return &listCommand{
-		name: "list",
-		use:  "list [account name]",
-	}
+	return &listCommand{name: "list"}
 }
 
 func (c *listCommand) listAccounts(accountName string, userName string) error {

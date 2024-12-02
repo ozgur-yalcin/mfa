@@ -15,10 +15,9 @@ import (
 
 type addCommand struct {
 	r           *rootCommand
-	name        string
-	use         string
-	commands    []Commander
 	fs          *flag.FlagSet
+	commands    []Commander
+	name        string
 	mode        string
 	base32      bool
 	hash        string
@@ -30,10 +29,6 @@ type addCommand struct {
 
 func (c *addCommand) Name() string {
 	return c.name
-}
-
-func (c *addCommand) Use() string {
-	return c.use
 }
 
 func (c *addCommand) Init(cd *Ancestor) error {
@@ -84,10 +79,7 @@ func (c *addCommand) Commands() []Commander {
 }
 
 func newAddCommand() *addCommand {
-	return &addCommand{
-		name: "add",
-		use:  "add [flags] <account name> <secret key>",
-	}
+	return &addCommand{name: "add"}
 }
 
 func (c *addCommand) generateCode(secretKey string) (code string, err error) {

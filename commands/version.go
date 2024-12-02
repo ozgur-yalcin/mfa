@@ -10,18 +10,13 @@ import (
 
 type versionCommand struct {
 	r        *rootCommand
-	name     string
-	use      string
-	commands []Commander
 	fs       *flag.FlagSet
+	commands []Commander
+	name     string
 }
 
 func (c *versionCommand) Name() string {
 	return c.name
-}
-
-func (c *versionCommand) Use() string {
-	return c.use
 }
 
 func (c *versionCommand) Init(cd *Ancestor) error {
@@ -39,10 +34,7 @@ func (c *versionCommand) Commands() []Commander {
 }
 
 func newVersionCommand() *versionCommand {
-	return &versionCommand{
-		name: "version",
-		use:  "version",
-	}
+	return &versionCommand{name: "version"}
 }
 
 func (c *versionCommand) ShowVersion() {
