@@ -4,7 +4,7 @@ mfa *("multi-factor authentication")* is a command line tool for generating and 
 
 **Description**:
 
-* An easy-to-use substitute for 2FA apps like TOTP Google authenticator.
+* An easy-to-use substitute for 2FA apps like Google authenticator.
 * Supports the OATH algorithms, such as TOTP and HOTP.
 * No need for network connection.
 * No need for phone.
