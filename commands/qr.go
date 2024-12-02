@@ -83,7 +83,13 @@ func (c *qrCommand) Run(ctx context.Context, cd *Ancestor, args []string) error 
 	if u.Scheme != "otpauth" {
 		return errors.New("invalid scheme")
 	}
-	account := &models.Account{Mode: c.mode, Hash: c.hash, Digits: c.digits, Period: c.period, Counter: c.counter}
+	account := &models.Account{
+		Mode:    c.mode,
+		Hash:    c.hash,
+		Digits:  c.digits,
+		Period:  c.period,
+		Counter: c.counter,
+	}
 	if host := u.Hostname(); host != "" {
 		account.Mode = host
 	}
