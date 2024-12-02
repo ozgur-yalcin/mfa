@@ -70,7 +70,7 @@ func (c *qrCommand) Run(ctx context.Context, cd *Ancestor, args []string) error 
 	if err != nil {
 		return err
 	}
-	u, err := url.Parse(otpauth.String())
+	u, err := url.Parse(strings.ReplaceAll(otpauth.String(), "&amp;", "&"))
 	if err != nil {
 		return err
 	}
@@ -87,17 +87,22 @@ func (c *qrCommand) Run(ctx context.Context, cd *Ancestor, args []string) error 
 	if host := u.Hostname(); host != "" {
 		account.Mode = host
 	}
-	if user := u.User.Username(); user != "" {
-		account.User = user
+	if path := strings.TrimPrefix(u.Path, "/"); path != "" {
+		if pairs := strings.SplitN(path, ":", 2); len(pairs) == 2 {
+			account.Issuer = pairs[0]
+			account.User = pairs[1]
+		} else {
+			account.Issuer = path
+		}
+	}
+	if issuer := q.Get("issuer"); issuer != "" {
+		account.Issuer = issuer
 	}
 	if secret := q.Get("secret"); secret != "" {
 		account.Secret = secret
 	}
 	if hash := q.Get("algorithm"); hash != "" {
 		account.Hash = hash
-	}
-	if issuer := q.Get("issuer"); issuer != "" {
-		account.Issuer = issuer
 	}
 	if digits := q.Get("digits"); digits != "" {
 		fmt.Sscanf(digits, "%d", &account.Digits)
