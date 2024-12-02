@@ -115,7 +115,7 @@ func (c *updateCommand) updateAccount(accountName string, userName string, secre
 	} else if len(accounts) > 1 {
 		log.Fatal("multiple accounts found")
 	} else if len(accounts) == 1 {
-		account := db.RetrieveFirstAccount(accountName, userName)
+		account := db.GetAccount(accountName, userName)
 		account.AccountName = accountName
 		account.Username = userName
 		account.SecretKey = secretKey

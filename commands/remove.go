@@ -65,8 +65,14 @@ func (c *removeCommand) removeAccount(accountName string, userName string) error
 		log.Fatal(err)
 	}
 	defer db.Close()
-	if err := db.RemoveAccount(accountName, userName); err != nil {
+	accounts, err := db.ListAccounts(accountName, userName)
+	if err != nil {
 		log.Fatal(err)
+	}
+	if len(accounts) == 0 {
+		log.Fatal("account not found")
+	} else if len(accounts) > 0 {
+		return db.RemoveAccount(accountName, userName)
 	}
 	return nil
 }
