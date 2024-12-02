@@ -15,6 +15,5 @@ const (
 )
 
 func DefaultConfig() *Config {
-	path := path.Join(".", sqliteFileName)
-	return &Config{DatabaseBackend: backend.NewSqlite(path)}
+	return &Config{DatabaseBackend: backend.NewSqlite(path.Join(".", sqliteFileName))}
 }
