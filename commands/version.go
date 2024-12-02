@@ -2,7 +2,8 @@ package commands
 
 import (
 	"context"
-	"fmt"
+	"flag"
+	"log"
 
 	"github.com/ozgur-yalcin/mfa/internal/initialize"
 )
@@ -12,6 +13,7 @@ type versionCommand struct {
 	name     string
 	use      string
 	commands []Commander
+	fs       *flag.FlagSet
 }
 
 func (c *versionCommand) Name() string {
@@ -23,18 +25,7 @@ func (c *versionCommand) Use() string {
 }
 
 func (c *versionCommand) Init(cd *Ancestor) error {
-	cmd := cd.Command
-	cmd.Short = "show version"
-	cmd.Long = "show version"
-	return nil
-}
-
-func (c *versionCommand) Args(ctx context.Context, cd *Ancestor, args []string) error {
-	return nil
-}
-
-func (c *versionCommand) PreRun(cd, runner *Ancestor) error {
-	c.r = cd.Root.Commander.(*rootCommand)
+	c.fs = flag.NewFlagSet(c.name, flag.ExitOnError)
 	return nil
 }
 
@@ -48,13 +39,12 @@ func (c *versionCommand) Commands() []Commander {
 }
 
 func newVersionCommand() *versionCommand {
-	versionCmd := &versionCommand{
+	return &versionCommand{
 		name: "version",
 		use:  "version",
 	}
-	return versionCmd
 }
 
 func (c *versionCommand) ShowVersion() {
-	fmt.Printf("mfa %s\n", initialize.Version)
+	log.Printf("mfa %s\n", initialize.Version)
 }

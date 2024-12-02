@@ -12,6 +12,6 @@ func main() {
 	log.SetOutput(os.Stdout)
 	err := commands.Execute(os.Args[1:])
 	if err != nil {
-		log.Fatalf("Error: %s", err)
+		log.Fatal(err)
 	}
 }

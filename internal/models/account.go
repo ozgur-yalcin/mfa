@@ -1,7 +1,7 @@
 package models
 
 import (
-	"fmt"
+	"errors"
 
 	"github.com/ozgur-yalcin/mfa/otp"
 )
@@ -28,7 +28,7 @@ func (a Account) OTP() (code string, err error) {
 		totp := otp.NewTOTP(a.Base32, a.Hash, a.ValueLength, a.Epoch, a.Interval)
 		code, err = totp.GeneratePassCode(a.SecretKey)
 	} else {
-		return code, fmt.Errorf("mode should be hotp or totp")
+		return code, errors.New("mode should be hotp or totp")
 	}
 	return
 }

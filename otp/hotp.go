@@ -8,6 +8,7 @@ import (
 	"encoding/base32"
 	"encoding/binary"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"math"
 	"strings"
@@ -36,13 +37,13 @@ func (t *HOTP) GeneratePassCode(secretKey string) (code string, err error) {
 		secretKey = strings.ToUpper(secretKey)
 		secret, err = base32.StdEncoding.DecodeString(secretKey)
 		if err != nil {
-			return "", fmt.Errorf("base32 decoding failed: Base32-encoded secret key is invalid")
+			return "", errors.New("base32 decoding failed: Base32-encoded secret key is invalid")
 		}
 	} else {
 		secretKey = strings.Join(strings.Fields(secretKey), "")
 		secret, err = hex.DecodeString(secretKey)
 		if err != nil {
-			return "", fmt.Errorf("hex decoding failed: hex-encoded secret key is invalid")
+			return "", errors.New("hex decoding failed: hex-encoded secret key is invalid")
 		}
 	}
 	var sum []byte
@@ -60,7 +61,7 @@ func (t *HOTP) GeneratePassCode(secretKey string) (code string, err error) {
 		mac.Write(counterToBytes(t.counter))
 		sum = mac.Sum(nil)
 	default:
-		return "", fmt.Errorf("invalid hash algorithm. valid hash algorithms include values SHA1, SHA256, or SHA512")
+		return "", errors.New("invalid hash algorithm. valid hash algorithms include values SHA1, SHA256, or SHA512")
 	}
 	offset := sum[len(sum)-1] & 0xf
 	binaryCode := binary.BigEndian.Uint32(sum[offset:])

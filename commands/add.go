@@ -2,7 +2,8 @@ package commands
 
 import (
 	"context"
-	"fmt"
+	"errors"
+	"flag"
 	"log"
 	"strings"
 
@@ -10,7 +11,6 @@ import (
 	"github.com/ozgur-yalcin/mfa/internal/initialize"
 	"github.com/ozgur-yalcin/mfa/internal/models"
 	"github.com/ozgur-yalcin/mfa/otp"
-	"github.com/spf13/cobra"
 )
 
 type addCommand struct {
@@ -18,6 +18,7 @@ type addCommand struct {
 	name        string
 	use         string
 	commands    []Commander
+	fs          *flag.FlagSet
 	mode        string
 	base32      bool
 	hash        string
@@ -36,56 +37,46 @@ func (c *addCommand) Use() string {
 }
 
 func (c *addCommand) Init(cd *Ancestor) error {
-	cmd := cd.Command
-	cmd.Short = "Add account and its secret key"
-	cmd.Long = "Add account and its secret key"
-	cmd.Flags().StringVarP(&c.mode, "mode", "m", "totp", "use time-variant TOTP mode or use event-based HOTP mode")
-	cmd.Flags().BoolVarP(&c.base32, "base32", "b", true, "use base32 encoding of KEY instead of hex")
-	cmd.Flags().StringVarP(&c.hash, "hash", "H", "SHA1", "A cryptographic hash method H")
-	cmd.Flags().IntVarP(&c.valueLength, "length", "l", 6, "A HOTP value length d")
-	cmd.Flags().Int64VarP(&c.counter, "counter", "c", 0, "used for HOTP, A counter C, which counts the number of iterations")
-	cmd.Flags().Int64VarP(&c.epoch, "epoch", "e", 0, "used for TOTP, epoch (T0) which is the Unix time from which to start counting time steps")
-	cmd.Flags().Int64VarP(&c.interval, "interval", "i", 30, "used for TOTP, an interval (Tx) which will be used to calculate the value of the counter CT")
-	return nil
-}
-
-func (c *addCommand) Args(ctx context.Context, cd *Ancestor, args []string) error {
-	if err := cobra.ExactArgs(2)(cd.Command, args); err != nil {
-		return err
-	}
-	if c.mode != "hotp" && c.mode != "totp" {
-		return fmt.Errorf("mode should be hotp or totp")
-	}
-	return nil
-}
-
-func (c *addCommand) PreRun(cd, runner *Ancestor) error {
-	c.r = cd.Root.Commander.(*rootCommand)
+	c.fs = flag.NewFlagSet(c.name, flag.ExitOnError)
+	c.fs.StringVar(&c.mode, "mode", "totp", "use time-variant TOTP mode or use event-based HOTP mode")
+	c.fs.StringVar(&c.mode, "m", "totp", "use time-variant TOTP mode or use event-based HOTP mode (shorthand)")
+	c.fs.BoolVar(&c.base32, "base32", true, "use base32 encoding of KEY instead of hex")
+	c.fs.BoolVar(&c.base32, "b", true, "use base32 encoding of KEY instead of hex (shorthand)")
+	c.fs.StringVar(&c.hash, "hash", "SHA1", "A cryptographic hash method H")
+	c.fs.StringVar(&c.hash, "H", "SHA1", "A cryptographic hash method H (shorthand)")
+	c.fs.IntVar(&c.valueLength, "length", 6, "A HOTP value length d")
+	c.fs.IntVar(&c.valueLength, "l", 6, "A HOTP value length d (shorthand)")
+	c.fs.Int64Var(&c.counter, "counter", 0, "used for HOTP, A counter C, which counts the number of iterations")
+	c.fs.Int64Var(&c.counter, "c", 0, "used for HOTP, A counter C, which counts the number of iterations (shorthand)")
+	c.fs.Int64Var(&c.epoch, "epoch", 0, "used for TOTP, epoch (T0) which is the Unix time from which to start counting time steps")
+	c.fs.Int64Var(&c.epoch, "e", 0, "used for TOTP, epoch (T0) which is the Unix time from which to start counting time steps (shorthand)")
+	c.fs.Int64Var(&c.interval, "interval", 30, "used for TOTP, an interval (Tx) which will be used to calculate the value of the counter CT")
+	c.fs.Int64Var(&c.interval, "i", 30, "used for TOTP, an interval (Tx) which will be used to calculate the value of the counter CT (shorthand)")
 	return nil
 }
 
 func (c *addCommand) Run(ctx context.Context, cd *Ancestor, args []string) (err error) {
 	initialize.Init()
-	if err = cobra.ExactArgs(2)(cd.Command, args); err != nil {
-		return
+	if err := c.fs.Parse(args); err != nil {
+		log.Fatal(err)
 	}
-	accountName := args[0]
-	secretKey := args[1]
-	var userName string
-	if pairs := strings.SplitN(accountName, ":", 2); len(pairs) == 2 {
+	var accountName, userName, secretKey string
+	if pairs := strings.SplitN(c.fs.Arg(0), ":", 2); len(pairs) == 2 {
 		accountName = pairs[0]
 		userName = pairs[1]
+		secretKey = c.fs.Arg(1)
+	} else {
+		accountName = c.fs.Arg(0)
+		secretKey = c.fs.Arg(1)
 	}
-	if _, err = c.generateCode(secretKey); err != nil {
+	if _, err := c.generateCode(secretKey); err != nil {
 		log.Fatal(err)
 	}
-	if err = c.saveAccount(accountName, userName, secretKey); err != nil {
+	if err := c.saveAccount(accountName, userName, secretKey); err != nil {
 		log.Fatal(err)
 	}
-	if err == nil {
-		fmt.Println("account added successfully")
-	}
-	return err
+	log.Println("account added successfully")
+	return nil
 }
 
 func (c *addCommand) Commands() []Commander {
@@ -93,11 +84,10 @@ func (c *addCommand) Commands() []Commander {
 }
 
 func newAddCommand() *addCommand {
-	addCmd := &addCommand{
+	return &addCommand{
 		name: "add",
 		use:  "add [flags] <account name> <secret key>",
 	}
-	return addCmd
 }
 
 func (c *addCommand) generateCode(secretKey string) (code string, err error) {
@@ -108,10 +98,10 @@ func (c *addCommand) generateCode(secretKey string) (code string, err error) {
 		totp := otp.NewTOTP(c.base32, c.hash, c.valueLength, c.epoch, c.interval)
 		code, err = totp.GeneratePassCode(secretKey)
 	} else {
-		return code, fmt.Errorf("mode should be hotp or totp")
+		return code, errors.New("mode should be hotp or totp")
 	}
-	if err == nil {
-		fmt.Println("Code:", code)
+	if err != nil {
+		log.Fatal(err)
 	}
 	return
 }
@@ -119,10 +109,10 @@ func (c *addCommand) generateCode(secretKey string) (code string, err error) {
 func (c *addCommand) saveAccount(accountName string, userName string, secretKey string) error {
 	db, err := database.LoadDatabase()
 	if err != nil {
-		return fmt.Errorf("failed to load database: %w", err)
+		log.Fatal(err)
 	}
 	if err := db.Open(); err != nil {
-		log.Fatalf("failed to connect database:%s", err.Error())
+		log.Fatal(err)
 	}
 	defer db.Close()
 	account := &models.Account{

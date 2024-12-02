@@ -2,24 +2,19 @@ package commands
 
 import (
 	"context"
+	"flag"
 	"fmt"
-	"io"
-	"log"
 	"log/slog"
 	"os"
 
 	"github.com/ozgur-yalcin/mfa/internal/initialize"
-	"github.com/spf13/cobra"
 )
 
 type rootCommand struct {
-	Printf   func(format string, v ...interface{})
-	Println  func(a ...interface{})
-	Out      io.Writer
-	logger   log.Logger
 	name     string
 	use      string
 	commands []Commander
+	fs       *flag.FlagSet
 }
 
 func (r *rootCommand) Name() string {
@@ -31,24 +26,13 @@ func (r *rootCommand) Use() string {
 }
 
 func (r *rootCommand) Init(cd *Ancestor) error {
-	cmd := cd.Command
-	cmd.Use = "mfa [flags]"
-	cmd.Short = "mfa generate OTP"
-	cmd.Long = "mfa is a command line tool for generating and validating one-time password."
-	return nil
-}
-
-func (r *rootCommand) Args(ctx context.Context, cd *Ancestor, args []string) error {
-	return nil
-}
-
-func (r *rootCommand) PreRun(cd, runner *Ancestor) error {
+	r.fs = flag.NewFlagSet(r.name, flag.ExitOnError)
 	return nil
 }
 
 func (r *rootCommand) Run(ctx context.Context, cd *Ancestor, args []string) error {
 	slog.Debug(fmt.Sprintf("mfa version %q finishing with parameters %q", initialize.Version, os.Args))
-	return cd.Command.Usage()
+	return nil
 }
 
 func (r *rootCommand) Commands() []Commander {
@@ -56,34 +40,25 @@ func (r *rootCommand) Commands() []Commander {
 }
 
 func (r *Exec) Execute(ctx context.Context, args []string) (*Ancestor, error) {
-	if args == nil {
-		args = []string{}
+	if err := r.c.init(); err != nil {
+		return nil, err
 	}
-	r.c.Command.SetArgs(args)
-	cobraCommand, err := r.c.Command.ExecuteContextC(ctx)
-	var cd *Ancestor
-	if cobraCommand != nil {
-		if err == nil {
-			err = checkArgs(cobraCommand, args)
-		}
-
-		// Find the ancestor that was executed.
-		var find func(*cobra.Command, *Ancestor) *Ancestor
-		find = func(what *cobra.Command, in *Ancestor) *Ancestor {
-			if in.Command == what {
-				return in
+	cd := r.c
+	if len(args) > 0 {
+		for _, subcmd := range r.c.ancestors {
+			if subcmd.Commander.Name() == args[0] {
+				cd = subcmd
+				break
 			}
-			for _, in2 := range in.ancestors {
-				if found := find(what, in2); found != nil {
-					return found
-				}
-			}
-			return nil
 		}
-		cd = find(cobraCommand, r.c)
 	}
-
-	return cd, err
+	if err := cd.Command.Parse(args); err != nil {
+		return cd, err
+	}
+	if err := cd.Commander.Run(ctx, cd, cd.Command.Args()[1:]); err != nil {
+		return cd, err
+	}
+	return cd, nil
 }
 
 func Execute(args []string) error {
@@ -91,17 +66,8 @@ func Execute(args []string) error {
 	if err != nil {
 		return err
 	}
-	cd, err := x.Execute(context.Background(), args)
-	if err != nil {
-		if err == errHelp {
-			cd.Command.Help()
-			fmt.Println()
-			return nil
-		}
-		if IsCommandError(err) {
-			cd.Command.Help()
-			fmt.Println()
-		}
+	if _, err := x.Execute(context.Background(), args); err != nil {
+		return err
 	}
 	return err
 }
@@ -122,7 +88,6 @@ func New(rootCmd Commander) (*Exec, error) {
 		for _, c := range cmd.Commands() {
 			addCommands(cd2, c)
 		}
-
 	}
 	for _, cmd := range rootCmd.Commands() {
 		addCommands(rootCd, cmd)

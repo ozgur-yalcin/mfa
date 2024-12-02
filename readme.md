@@ -33,7 +33,6 @@ Available Commands:
   add         Add account and its secret key
   completion  Generate the autocompletion script for the specified shell
   generate    Generate one-time password from secret key
-  help        Help about any command
   list        List all added accounts and password code
   remove      Remove account and its secret key
   update      Add account and its secret key
@@ -56,7 +55,6 @@ Flags:
   -c, --counter int    used for HOTP, A counter C, which counts the number of iterations
   -e, --epoch int      used for TOTP, epoch (T0) which is the Unix time from which to start counting time steps
   -H, --hash string    A cryptographic hash method H (SHA1, SHA256, SHA512) (default "SHA1")
-  -h, --help           help for generate
   -i, --interval int   used for TOTP, an interval (Tx) which will be used to calculate the value of the counter CT (default 30)
   -l, --length int     A HOTP value length d (default 6)
   -m, --mode string    use time-variant TOTP mode or use event-based HOTP mode (default "totp")
