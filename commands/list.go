@@ -29,8 +29,16 @@ type listCommand struct {
 	name     string
 }
 
+func newListCommand() *listCommand {
+	return &listCommand{name: "list"}
+}
+
 func (c *listCommand) Name() string {
 	return c.name
+}
+
+func (c *listCommand) Commands() []Commander {
+	return c.commands
 }
 
 func (c *listCommand) Init(cd *Ancestor) error {
@@ -59,14 +67,6 @@ func (c *listCommand) Run(ctx context.Context, cd *Ancestor, args []string) erro
 		log.Fatal(err)
 	}
 	return nil
-}
-
-func (c *listCommand) Commands() []Commander {
-	return c.commands
-}
-
-func newListCommand() *listCommand {
-	return &listCommand{name: "list"}
 }
 
 func (c *listCommand) listAccounts(accountName string, userName string) error {

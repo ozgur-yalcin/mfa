@@ -17,8 +17,16 @@ type removeCommand struct {
 	name     string
 }
 
+func newRemoveCommand() *removeCommand {
+	return &removeCommand{name: "remove"}
+}
+
 func (c *removeCommand) Name() string {
 	return c.name
+}
+
+func (c *removeCommand) Commands() []Commander {
+	return c.commands
 }
 
 func (c *removeCommand) Init(cd *Ancestor) error {
@@ -46,14 +54,6 @@ func (c *removeCommand) Run(ctx context.Context, cd *Ancestor, args []string) er
 	}
 	log.Println("accounts deleted successfully")
 	return nil
-}
-
-func (c *removeCommand) Commands() []Commander {
-	return c.commands
-}
-
-func newRemoveCommand() *removeCommand {
-	return &removeCommand{name: "remove"}
 }
 
 func (c *removeCommand) removeAccount(accountName string, userName string) error {

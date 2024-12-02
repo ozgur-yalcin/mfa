@@ -24,31 +24,6 @@ type Exec struct {
 	c *Ancestor
 }
 
-func (c *Ancestor) init() error {
-	var ancestors []*Ancestor
-	{
-		cd := c
-		for cd != nil {
-			ancestors = append(ancestors, cd)
-			cd = cd.Parent
-		}
-	}
-	return nil
-}
-
-func (c *Ancestor) compile() error {
-	c.Command = flag.NewFlagSet(c.Commander.Name(), flag.ContinueOnError)
-	if err := c.Commander.Init(c); err != nil {
-		return err
-	}
-	for _, cc := range c.ancestors {
-		if err := cc.compile(); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
 func newExec() (*Exec, error) {
 	rootCmd := &rootCommand{
 		name: "mfa",
@@ -62,4 +37,29 @@ func newExec() (*Exec, error) {
 		},
 	}
 	return New(rootCmd)
+}
+
+func (c *Ancestor) init() error {
+	var ancestors []*Ancestor
+	{
+		cd := c
+		for cd != nil {
+			ancestors = append(ancestors, cd)
+			cd = cd.Parent
+		}
+	}
+	return nil
+}
+
+func (c *Ancestor) run() error {
+	c.Command = flag.NewFlagSet(c.Commander.Name(), flag.ContinueOnError)
+	if err := c.Commander.Init(c); err != nil {
+		return err
+	}
+	for _, cc := range c.ancestors {
+		if err := cc.run(); err != nil {
+			return err
+		}
+	}
+	return nil
 }

@@ -15,8 +15,16 @@ type versionCommand struct {
 	name     string
 }
 
+func newVersionCommand() *versionCommand {
+	return &versionCommand{name: "version"}
+}
+
 func (c *versionCommand) Name() string {
 	return c.name
+}
+
+func (c *versionCommand) Commands() []Commander {
+	return c.commands
 }
 
 func (c *versionCommand) Init(cd *Ancestor) error {
@@ -27,14 +35,6 @@ func (c *versionCommand) Init(cd *Ancestor) error {
 func (c *versionCommand) Run(ctx context.Context, cd *Ancestor, args []string) error {
 	c.ShowVersion()
 	return nil
-}
-
-func (c *versionCommand) Commands() []Commander {
-	return c.commands
-}
-
-func newVersionCommand() *versionCommand {
-	return &versionCommand{name: "version"}
 }
 
 func (c *versionCommand) ShowVersion() {

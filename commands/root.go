@@ -68,27 +68,27 @@ func Execute(args []string) error {
 }
 
 func New(rootCmd Commander) (*Exec, error) {
-	rootCd := &Ancestor{
+	root := &Ancestor{
 		Commander: rootCmd,
 	}
-	rootCd.Root = rootCd
+	root.Root = root
 	var addCommands func(cd *Ancestor, cmd Commander)
 	addCommands = func(cd *Ancestor, cmd Commander) {
-		cd2 := &Ancestor{
-			Root:      rootCd,
+		sub := &Ancestor{
+			Root:      root,
 			Parent:    cd,
 			Commander: cmd,
 		}
-		cd.ancestors = append(cd.ancestors, cd2)
+		cd.ancestors = append(cd.ancestors, sub)
 		for _, c := range cmd.Commands() {
-			addCommands(cd2, c)
+			addCommands(sub, c)
 		}
 	}
-	for _, cmd := range rootCmd.Commands() {
-		addCommands(rootCd, cmd)
+	for _, c := range rootCmd.Commands() {
+		addCommands(root, c)
 	}
-	if err := rootCd.compile(); err != nil {
+	if err := root.run(); err != nil {
 		return nil, err
 	}
-	return &Exec{c: rootCd}, nil
+	return &Exec{c: root}, nil
 }

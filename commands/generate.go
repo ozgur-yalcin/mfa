@@ -23,8 +23,17 @@ type generateCommand struct {
 	interval    int64
 }
 
+func newGenerateCommand() *generateCommand {
+	generateCmd := &generateCommand{name: "generate"}
+	return generateCmd
+}
+
 func (c *generateCommand) Name() string {
 	return c.name
+}
+
+func (c *generateCommand) Commands() []Commander {
+	return c.commands
 }
 
 func (c *generateCommand) Init(cd *Ancestor) error {
@@ -73,13 +82,4 @@ func (c *generateCommand) generateCode(secretKey string) (code string, err error
 		log.Fatal(err)
 	}
 	return
-}
-
-func (c *generateCommand) Commands() []Commander {
-	return c.commands
-}
-
-func newGenerateCommand() *generateCommand {
-	generateCmd := &generateCommand{name: "generate"}
-	return generateCmd
 }

@@ -26,8 +26,16 @@ type updateCommand struct {
 	interval    int64
 }
 
+func newUpdateCommand() *updateCommand {
+	return &updateCommand{name: "update"}
+}
+
 func (c *updateCommand) Name() string {
 	return c.name
+}
+
+func (c *updateCommand) Commands() []Commander {
+	return c.commands
 }
 
 func (c *updateCommand) Init(cd *Ancestor) error {
@@ -71,14 +79,6 @@ func (c *updateCommand) Run(ctx context.Context, cd *Ancestor, args []string) er
 	}
 	log.Println("account updated successfully")
 	return nil
-}
-
-func (c *updateCommand) Commands() []Commander {
-	return c.commands
-}
-
-func newUpdateCommand() *updateCommand {
-	return &updateCommand{name: "update"}
 }
 
 func (c *updateCommand) generateCode(secretKey string) (code string, err error) {

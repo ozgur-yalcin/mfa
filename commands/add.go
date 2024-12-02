@@ -27,8 +27,16 @@ type addCommand struct {
 	interval    int64
 }
 
+func newAddCommand() *addCommand {
+	return &addCommand{name: "add"}
+}
+
 func (c *addCommand) Name() string {
 	return c.name
+}
+
+func (c *addCommand) Commands() []Commander {
+	return c.commands
 }
 
 func (c *addCommand) Init(cd *Ancestor) error {
@@ -72,14 +80,6 @@ func (c *addCommand) Run(ctx context.Context, cd *Ancestor, args []string) (err 
 	}
 	log.Println("account added successfully")
 	return nil
-}
-
-func (c *addCommand) Commands() []Commander {
-	return c.commands
-}
-
-func newAddCommand() *addCommand {
-	return &addCommand{name: "add"}
 }
 
 func (c *addCommand) generateCode(secretKey string) (code string, err error) {
