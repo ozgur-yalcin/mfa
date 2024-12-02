@@ -19,11 +19,9 @@ func (db *Database) Open() (err error) {
 	var conn *gorm.DB
 	switch db.backend.Engine() {
 	case "sqlite":
-		params := db.backend.Params()
-		conn, err = gorm.Open(sqlite.Open(params), &gorm.Config{})
+		conn, err = gorm.Open(sqlite.Open(db.backend.Params()), &gorm.Config{})
 	case "postgresql":
-		params := db.backend.Params()
-		conn, err = gorm.Open(postgres.Open(params), &gorm.Config{})
+		conn, err = gorm.Open(postgres.Open(db.backend.Params()), &gorm.Config{})
 	default:
 		return errors.New("not supported database engine")
 	}
@@ -43,7 +41,7 @@ func (db *Database) Close() (err error) {
 }
 
 func LoadDatabase() (*Database, error) {
-	return &Database{backend: config.DefaultConfig().DatabaseBackend}, nil
+	return &Database{backend: config.Default()}, nil
 }
 
 func (db *Database) Engine() string {
