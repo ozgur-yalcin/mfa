@@ -10,31 +10,31 @@ import (
 	"github.com/ozgur-yalcin/mfa/internal/initialize"
 )
 
-type removeCommand struct {
+type delCommand struct {
 	r        *rootCommand
 	fs       *flag.FlagSet
 	commands []Commander
 	name     string
 }
 
-func newRemoveCommand() *removeCommand {
-	return &removeCommand{name: "remove"}
+func newDelCommand() *delCommand {
+	return &delCommand{name: "del"}
 }
 
-func (c *removeCommand) Name() string {
+func (c *delCommand) Name() string {
 	return c.name
 }
 
-func (c *removeCommand) Commands() []Commander {
+func (c *delCommand) Commands() []Commander {
 	return c.commands
 }
 
-func (c *removeCommand) Init(cd *Ancestor) error {
+func (c *delCommand) Init(cd *Ancestor) error {
 	c.fs = flag.NewFlagSet(c.name, flag.ExitOnError)
 	return nil
 }
 
-func (c *removeCommand) Run(ctx context.Context, cd *Ancestor, args []string) error {
+func (c *delCommand) Run(ctx context.Context, cd *Ancestor, args []string) error {
 	initialize.Init()
 	if err := c.fs.Parse(args); err != nil {
 		log.Fatal(err)
@@ -49,14 +49,14 @@ func (c *removeCommand) Run(ctx context.Context, cd *Ancestor, args []string) er
 	if issuer == "" {
 		log.Fatal("account name cannot be empty")
 	}
-	if err := c.removeAccount(issuer, user); err != nil {
+	if err := c.delAccount(issuer, user); err != nil {
 		log.Fatal(err)
 	}
 	log.Println("accounts deleted successfully")
 	return nil
 }
 
-func (c *removeCommand) removeAccount(issuer string, user string) error {
+func (c *delCommand) delAccount(issuer string, user string) error {
 	db, err := database.LoadDatabase()
 	if err != nil {
 		log.Fatal(err)
@@ -72,7 +72,7 @@ func (c *removeCommand) removeAccount(issuer string, user string) error {
 	if len(accounts) == 0 {
 		log.Fatal("account not found")
 	} else if len(accounts) > 0 {
-		return db.RemoveAccount(issuer, user)
+		return db.DelAccount(issuer, user)
 	}
 	return nil
 }

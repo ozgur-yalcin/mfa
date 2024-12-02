@@ -9,7 +9,7 @@ import (
 	"github.com/ozgur-yalcin/mfa/otp"
 )
 
-type generateCommand struct {
+type genCommand struct {
 	r        *rootCommand
 	fs       *flag.FlagSet
 	commands []Commander
@@ -21,20 +21,19 @@ type generateCommand struct {
 	counter  int64
 }
 
-func newGenerateCommand() *generateCommand {
-	generateCmd := &generateCommand{name: "generate"}
-	return generateCmd
+func newGenCommand() *genCommand {
+	return &genCommand{name: "gen"}
 }
 
-func (c *generateCommand) Name() string {
+func (c *genCommand) Name() string {
 	return c.name
 }
 
-func (c *generateCommand) Commands() []Commander {
+func (c *genCommand) Commands() []Commander {
 	return c.commands
 }
 
-func (c *generateCommand) Init(cd *Ancestor) error {
+func (c *genCommand) Init(cd *Ancestor) error {
 	c.fs = flag.NewFlagSet(c.name, flag.ExitOnError)
 	c.fs.StringVar(&c.mode, "mode", "totp", "use time-variant TOTP mode or use event-based HOTP mode")
 	c.fs.StringVar(&c.mode, "m", "totp", "use time-variant TOTP mode or use event-based HOTP mode (shorthand)")
@@ -49,7 +48,7 @@ func (c *generateCommand) Init(cd *Ancestor) error {
 	return nil
 }
 
-func (c *generateCommand) Run(ctx context.Context, cd *Ancestor, args []string) (err error) {
+func (c *genCommand) Run(ctx context.Context, cd *Ancestor, args []string) (err error) {
 	if err := c.fs.Parse(args); err != nil {
 		return err
 	}
@@ -62,7 +61,7 @@ func (c *generateCommand) Run(ctx context.Context, cd *Ancestor, args []string) 
 	return
 }
 
-func (c *generateCommand) generateCode(secret string) (code string, err error) {
+func (c *genCommand) generateCode(secret string) (code string, err error) {
 	if c.mode == "hotp" {
 		hotp := otp.NewHOTP(c.hash, c.digits, c.counter)
 		code, err = hotp.GeneratePassCode(secret)

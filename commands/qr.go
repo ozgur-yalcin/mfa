@@ -40,8 +40,7 @@ type qrCommand struct {
 }
 
 func newQrCommand() *qrCommand {
-	qrCmd := &qrCommand{name: "qr"}
-	return qrCmd
+	return &qrCommand{name: "qr"}
 }
 
 func (c *qrCommand) Name() string {
@@ -119,7 +118,7 @@ func (c *qrCommand) Run(ctx context.Context, cd *Ancestor, args []string) error 
 	if counter := u.Query().Get("counter"); counter != "" && account.Mode == "hotp" {
 		fmt.Sscanf(counter, "%d", &account.Counter)
 	}
-	if err := c.saveAccount(account); err != nil {
+	if err := c.setAccount(account); err != nil {
 		log.Fatal(err)
 	}
 	log.Println("account added successfully")
@@ -146,7 +145,7 @@ func (c *qrCommand) readQRCode(path string) (*scan.Result, error) {
 	return reader.Decode(bitmap, nil)
 }
 
-func (c *qrCommand) saveAccount(account *models.Account) error {
+func (c *qrCommand) setAccount(account *models.Account) error {
 	db, err := database.LoadDatabase()
 	if err != nil {
 		log.Fatal(err)
@@ -162,7 +161,7 @@ func (c *qrCommand) saveAccount(account *models.Account) error {
 	if len(accounts) > 0 {
 		log.Fatal("account already exists")
 	} else if len(accounts) == 0 {
-		return db.CreateAccount(account)
+		return db.AddAccount(account)
 	}
 	return nil
 }

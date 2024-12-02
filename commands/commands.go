@@ -25,19 +25,18 @@ type Exec struct {
 }
 
 func newExec() (*Exec, error) {
-	rootCmd := &rootCommand{
+	return New(&rootCommand{
 		name: "mfa",
 		commands: []Commander{
-			newGenerateCommand(),
+			newGenCommand(),
 			newQrCommand(),
 			newAddCommand(),
-			newRemoveCommand(),
-			newUpdateCommand(),
+			newDelCommand(),
+			newSetCommand(),
 			newListCommand(),
 			newVersionCommand(),
 		},
-	}
-	return New(rootCmd)
+	})
 }
 
 func (c *Ancestor) init() error {

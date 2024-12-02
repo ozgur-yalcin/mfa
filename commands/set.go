@@ -12,7 +12,7 @@ import (
 	"github.com/ozgur-yalcin/mfa/otp"
 )
 
-type updateCommand struct {
+type setCommand struct {
 	r        *rootCommand
 	fs       *flag.FlagSet
 	commands []Commander
@@ -24,19 +24,19 @@ type updateCommand struct {
 	counter  int64
 }
 
-func newUpdateCommand() *updateCommand {
-	return &updateCommand{name: "update"}
+func newSetCommand() *setCommand {
+	return &setCommand{name: "set"}
 }
 
-func (c *updateCommand) Name() string {
+func (c *setCommand) Name() string {
 	return c.name
 }
 
-func (c *updateCommand) Commands() []Commander {
+func (c *setCommand) Commands() []Commander {
 	return c.commands
 }
 
-func (c *updateCommand) Init(cd *Ancestor) error {
+func (c *setCommand) Init(cd *Ancestor) error {
 	c.fs = flag.NewFlagSet(c.name, flag.ExitOnError)
 	c.fs.StringVar(&c.mode, "mode", "totp", "use time-variant TOTP mode or use event-based HOTP mode")
 	c.fs.StringVar(&c.mode, "m", "totp", "use time-variant TOTP mode or use event-based HOTP mode (shorthand)")
@@ -51,7 +51,7 @@ func (c *updateCommand) Init(cd *Ancestor) error {
 	return nil
 }
 
-func (c *updateCommand) Run(ctx context.Context, cd *Ancestor, args []string) error {
+func (c *setCommand) Run(ctx context.Context, cd *Ancestor, args []string) error {
 	initialize.Init()
 	if err := c.fs.Parse(args); err != nil {
 		log.Fatal(err)
@@ -68,14 +68,14 @@ func (c *updateCommand) Run(ctx context.Context, cd *Ancestor, args []string) er
 	if _, err := c.generateCode(secret); err != nil {
 		log.Fatal(err)
 	}
-	if err := c.updateAccount(issuer, user, secret); err != nil {
+	if err := c.setAccount(issuer, user, secret); err != nil {
 		log.Fatal(err)
 	}
-	log.Println("account updated successfully")
+	log.Println("account setd successfully")
 	return nil
 }
 
-func (c *updateCommand) generateCode(secret string) (code string, err error) {
+func (c *setCommand) generateCode(secret string) (code string, err error) {
 	if c.mode == "hotp" {
 		hotp := otp.NewHOTP(c.hash, c.digits, c.counter)
 		code, err = hotp.GeneratePassCode(secret)
@@ -91,7 +91,7 @@ func (c *updateCommand) generateCode(secret string) (code string, err error) {
 	return
 }
 
-func (c *updateCommand) updateAccount(issuer string, user string, secret string) error {
+func (c *setCommand) setAccount(issuer string, user string, secret string) error {
 	db, err := database.LoadDatabase()
 	if err != nil {
 		log.Fatal(err)
@@ -118,7 +118,7 @@ func (c *updateCommand) updateAccount(issuer string, user string, secret string)
 		account.Digits = c.digits
 		account.Counter = c.counter
 		account.Period = c.period
-		return db.SaveAccount(account)
+		return db.SetAccount(account)
 	}
 	return nil
 }

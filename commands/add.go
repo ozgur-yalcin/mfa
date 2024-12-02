@@ -69,7 +69,7 @@ func (c *addCommand) Run(ctx context.Context, cd *Ancestor, args []string) (err 
 	if _, err := c.generateCode(secret); err != nil {
 		log.Fatal(err)
 	}
-	if err := c.saveAccount(issuer, user, secret); err != nil {
+	if err := c.setAccount(issuer, user, secret); err != nil {
 		log.Fatal(err)
 	}
 	log.Println("account added successfully")
@@ -92,7 +92,7 @@ func (c *addCommand) generateCode(secret string) (code string, err error) {
 	return
 }
 
-func (c *addCommand) saveAccount(issuer string, user string, secret string) error {
+func (c *addCommand) setAccount(issuer string, user string, secret string) error {
 	db, err := database.LoadDatabase()
 	if err != nil {
 		log.Fatal(err)
@@ -118,7 +118,7 @@ func (c *addCommand) saveAccount(issuer string, user string, secret string) erro
 			Period:  c.period,
 			Counter: c.counter,
 		}
-		return db.CreateAccount(account)
+		return db.AddAccount(account)
 	}
 	return nil
 }

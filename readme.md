@@ -2,19 +2,6 @@
 
 mfa *("multi-factor authentication")* is a command line tool for generating and validating one-time password.
 
-<!-- TOC -->
-
-  * [Usage](#usage)
-  * [Examples](#examples)
-    + [Generate code](#generate-code)
-    + [Add account](#add-account)
-    + [List account](#list-account)
-    + [Remove accounts](#remove-accounts)
-    + [Update account](#update-account)
-  * [License](#license)
-
-<!-- /TOC -->
-
 **Description**:
 
 * An easy-to-use substitute for 2FA apps like TOTP Google authenticator.
@@ -30,19 +17,20 @@ mfa [command] [flags] [args]
 
 ```
 Available Commands:
-  generate    Generate one-time password from secret key
-  add         Add account and its secret key
-  remove      Remove account and its secret key
-  update      Add account and its secret key
-  list        List all added accounts and password code
+  gen         Generate one-time password from secret key
+  add         Create account and its secret key
+  set         Update account and its secret key
+  del         Delete accounts and its secret key
+  list        List all accounts and password code
   version     show version
 ```
 
 ```
-mfa generate [flags] <secret key>
+mfa qr [flags]
+mfa gen [flags] <secret key>
 mfa add [flags] <account name> <secret key>
-mfa remove <account name> [user name]
-mfa update [flags] <account name> <secret key>
+mfa set [flags] <account name> <secret key>
+mfa del <account name> [user name]
 mfa list [account name]
 ```
 
@@ -64,24 +52,24 @@ Flags:
 Generate a **time-based** one-time password but do not save the secret key
 
 ```
-mfa generate ADOO3MCCCVO5AVD6
+mfa gen ADOO3MCCCVO5AVD6
 ```
 
 Generate a **counter-based** one-time password with counter 1
 
 ```
-mfa generate -m hotp -c 1 ADOO3MCCCVO5AVD6
+mfa gen -m hotp -c 1 ADOO3MCCCVO5AVD6
 ```
 
-### Add account
+### Create account
 
-Add an account named GitHub
+Create an account named GitHub
 
 ```
 mfa add GitHub ADOO3MCCCVO5AVD6
 ```
 
-Add an account, the account name is GitHub, the user name is ozgur-yalcin
+Create an account, the account name is GitHub, the user name is ozgur-yalcin
 
 ```
 mfa add GitHub:ozgur-yalcin ADOO3MCCCVO5AVD6
@@ -113,18 +101,18 @@ List accounts whose account name is GitHub and whose user is ozgur-yalcin
 mfa list GitHub ozgur-yalcin
 ```
 
-### Remove accounts
+### Delete accounts
 
-Remove all accounts named GitHub
+Delete all accounts named GitHub
 
 ```
-mfa remove GitHub
+mfa del GitHub
 ```
 
 Delete accounts  whose account name is GitHub and whose user is ozgur-yalcin
 
 ```
-mfa remove GitHub ozgur-yalcin
+mfa del GitHub ozgur-yalcin
 ```
 
 ### Update account
@@ -132,13 +120,13 @@ mfa remove GitHub ozgur-yalcin
 Update the secret key of accounts which account name is GitHub
 
 ```
-mfa update GitHub 5BRSSSBJUWBQBOXE
+mfa set GitHub 5BRSSSBJUWBQBOXE
 ```
 
 Update the secret key of accounts which account name is GitHub and the user is ozgur-yalcin
 
 ```
-mfa update GitHub:ozgur-yalcin 5BRSSSBJUWBQBOXE
+mfa set GitHub:ozgur-yalcin 5BRSSSBJUWBQBOXE
 ```
 
 ## License
