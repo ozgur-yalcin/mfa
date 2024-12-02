@@ -30,11 +30,11 @@ mfa version
 
 ```
 Commands:
-  gen         Generate otp by secret key
-  qr          Create account by qr code
-  add         Create account by secret key
-  set         Update account by secret key
-  del         Delete accounts by secret key
+  gen         Generate otp
+  qr          Create account
+  add         Create account
+  set         Update account
+  del         Delete accounts
   list        List accounts
   version     show version
 ```
