@@ -5,6 +5,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"html"
 	"image"
 	"log"
 	"net/url"
@@ -75,7 +76,7 @@ func (c *qrCommand) Run(ctx context.Context, cd *Ancestor, args []string) error 
 	if err != nil {
 		return err
 	}
-	u, err := url.Parse(strings.ReplaceAll(qr.String(), "&amp;", "&"))
+	u, err := url.Parse(html.UnescapeString(qr.String()))
 	if err != nil {
 		return err
 	}
