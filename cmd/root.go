@@ -1,4 +1,4 @@
-package commands
+package cmd
 
 import (
 	"context"
@@ -7,7 +7,7 @@ import (
 	"log/slog"
 	"os"
 
-	"github.com/ozgur-yalcin/mfa/internal/initialize"
+	"github.com/ozgur-yalcin/mfa/src/initialize"
 )
 
 type rootCommand struct {

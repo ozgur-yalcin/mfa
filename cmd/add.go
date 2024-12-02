@@ -1,4 +1,4 @@
-package commands
+package cmd
 
 import (
 	"context"
@@ -7,10 +7,10 @@ import (
 	"log"
 	"strings"
 
-	"github.com/ozgur-yalcin/mfa/internal/database"
-	"github.com/ozgur-yalcin/mfa/internal/initialize"
-	"github.com/ozgur-yalcin/mfa/internal/models"
 	"github.com/ozgur-yalcin/mfa/otp"
+	"github.com/ozgur-yalcin/mfa/src/database"
+	"github.com/ozgur-yalcin/mfa/src/initialize"
+	"github.com/ozgur-yalcin/mfa/src/models"
 )
 
 type addCommand struct {

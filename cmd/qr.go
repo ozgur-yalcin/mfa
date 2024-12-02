@@ -1,4 +1,4 @@
-package commands
+package cmd
 
 import (
 	"context"
@@ -20,11 +20,11 @@ import (
 	_ "golang.org/x/image/tiff"
 	_ "golang.org/x/image/webp"
 
-	"github.com/ozgur-yalcin/mfa/internal/database"
-	"github.com/ozgur-yalcin/mfa/internal/initialize"
-	"github.com/ozgur-yalcin/mfa/internal/models"
 	"github.com/ozgur-yalcin/mfa/scan"
 	"github.com/ozgur-yalcin/mfa/scan/qrcode"
+	"github.com/ozgur-yalcin/mfa/src/database"
+	"github.com/ozgur-yalcin/mfa/src/initialize"
+	"github.com/ozgur-yalcin/mfa/src/models"
 )
 
 type qrCommand struct {

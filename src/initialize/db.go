@@ -3,8 +3,8 @@ package initialize
 import (
 	"log"
 
-	"github.com/ozgur-yalcin/mfa/internal/database"
-	"github.com/ozgur-yalcin/mfa/internal/models"
+	"github.com/ozgur-yalcin/mfa/src/database"
+	"github.com/ozgur-yalcin/mfa/src/models"
 )
 
 func DB() {

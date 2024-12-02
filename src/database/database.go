@@ -4,8 +4,8 @@ import (
 	"log"
 	"sync"
 
-	"github.com/ozgur-yalcin/mfa/internal/backend"
-	"github.com/ozgur-yalcin/mfa/internal/config"
+	"github.com/ozgur-yalcin/mfa/src/backend"
+	"github.com/ozgur-yalcin/mfa/src/config"
 	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"

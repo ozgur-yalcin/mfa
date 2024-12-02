@@ -3,7 +3,7 @@ package config
 import (
 	"path"
 
-	"github.com/ozgur-yalcin/mfa/internal/backend"
+	"github.com/ozgur-yalcin/mfa/src/backend"
 )
 
 type Config struct {

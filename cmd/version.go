@@ -1,11 +1,11 @@
-package commands
+package cmd
 
 import (
 	"context"
 	"flag"
 	"log"
 
-	"github.com/ozgur-yalcin/mfa/internal/initialize"
+	"github.com/ozgur-yalcin/mfa/src/initialize"
 )
 
 type versionCommand struct {

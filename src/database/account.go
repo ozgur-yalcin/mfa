@@ -1,7 +1,7 @@
 package database
 
 import (
-	"github.com/ozgur-yalcin/mfa/internal/models"
+	"github.com/ozgur-yalcin/mfa/src/models"
 )
 
 func (db *Database) ListAccounts(issuer string, user string) (accounts []models.Account, err error) {
