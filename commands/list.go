@@ -107,7 +107,7 @@ func (c *listCommand) listAccounts(issuer string, user string) error {
 			return otps[i].issuer < otps[j].issuer
 		})
 		writer := tabwriter.NewWriter(os.Stdout, 8, 8, 1, '\t', 0)
-		fmt.Fprintf(writer, "%s\t%s\t%s\t%s\n", "", "Account name", "User name", "Code")
+		fmt.Fprintf(writer, "%s\t%s\t%s\t%s\n", "#", "Issuer", "User", "Code")
 		for i, item := range otps {
 			_, err := fmt.Fprintf(writer, "%d\t%s\t%s\t%s\n", i+1, item.issuer, item.user, item.code)
 			if err != nil {
