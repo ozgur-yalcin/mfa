@@ -9,10 +9,16 @@ mfa *("multi-factor authentication")* is a command line tool for generating and 
 * No need for network connection.
 * No need for phone.
 
+## Installation
+
+```
+go mod tidy
+go build -v
+```
+
 ## Usage
 
 ```
-Available Commands:
   gen         Generate otp by secret key
   qr          Create account by qr code
   add         Create account by secret key
