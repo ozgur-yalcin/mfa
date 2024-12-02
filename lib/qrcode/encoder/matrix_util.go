@@ -240,14 +240,6 @@ func findMSBSet(value int) int {
 	return 32 - bits.LeadingZeros32(uint32(value))
 }
 
-//	x^2
-//	__________________________________________________
-//
-
-// x^14 + x^13 + x^12 + x^11 + x^10 + x^7 + x^4 + x^2
-// --------------------------------------------------
-//
-//	x^11 + x^10 + x^7 + x^4 + x^2
 func calculateBCHCode(value, poly int) (int, error) {
 	if poly == 0 {
 		return 0, errors.New("IllegalArgumentException: 0 polynomial")

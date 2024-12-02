@@ -16,8 +16,6 @@ func NewRGBLuminanceSource(width, height int, pixels []int) LuminanceSource {
 	dataHeight := height
 	left := 0
 	top := 0
-
-	//
 	size := width * height
 	luminances := make([]byte, size)
 	for offset := 0; offset < size; offset++ {

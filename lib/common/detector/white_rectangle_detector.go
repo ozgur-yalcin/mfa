@@ -143,7 +143,6 @@ func (this *WhiteRectangleDetector) Detect() ([]lib.ResultPoint, error) {
 		}
 
 		var t lib.ResultPoint
-		//go down right
 		for i := 1; t == nil && i < maxSize; i++ {
 			t = this.getBlackPointOnSegment(left, up+i, left+i, up)
 		}
@@ -153,7 +152,6 @@ func (this *WhiteRectangleDetector) Detect() ([]lib.ResultPoint, error) {
 		}
 
 		var x lib.ResultPoint
-		//go down left
 		for i := 1; x == nil && i < maxSize; i++ {
 			x = this.getBlackPointOnSegment(right, up+i, right-i, up)
 		}
@@ -163,7 +161,6 @@ func (this *WhiteRectangleDetector) Detect() ([]lib.ResultPoint, error) {
 		}
 
 		var y lib.ResultPoint
-		//go up left
 		for i := 1; y == nil && i < maxSize; i++ {
 			y = this.getBlackPointOnSegment(right, down-i, right-i, down)
 		}
