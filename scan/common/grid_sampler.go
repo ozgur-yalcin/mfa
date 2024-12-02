@@ -24,9 +24,8 @@ func GridSampler_GetInstance() GridSampler {
 func GridSampler_checkAndNudgePoints(image *scan.BitMatrix, points []float64) error {
 	width := image.GetWidth()
 	height := image.GetHeight()
-	// Check and nudge points from start until we see some that are OK:
 	nudged := true
-	maxOffset := len(points) - 1 // points.length must be even
+	maxOffset := len(points) - 1
 	for offset := 0; offset < maxOffset && nudged; offset += 2 {
 		x := int(points[offset])
 		y := int(points[offset+1])
@@ -50,7 +49,6 @@ func GridSampler_checkAndNudgePoints(image *scan.BitMatrix, points []float64) er
 			nudged = true
 		}
 	}
-	// Check and nudge points from end:
 	nudged = true
 	for offset := len(points) - 2; offset >= 0 && nudged; offset -= 2 {
 		x := int(points[offset])

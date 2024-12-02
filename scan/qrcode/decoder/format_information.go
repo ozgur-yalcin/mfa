@@ -47,7 +47,7 @@ type FormatInformation struct {
 }
 
 func newFormatInformation(formatInfo uint) *FormatInformation {
-	errorCorrectionLevel, _ := ErrorCorrectionLevel_ForBits((formatInfo >> 3) & 0x03) // always success
+	errorCorrectionLevel, _ := ErrorCorrectionLevel_ForBits((formatInfo >> 3) & 0x03)
 	return &FormatInformation{
 		errorCorrectionLevel,
 		byte(formatInfo & 0x07),
@@ -101,6 +101,3 @@ func (f *FormatInformation) GetErrorCorrectionLevel() ErrorCorrectionLevel {
 func (f *FormatInformation) GetDataMask() byte {
 	return f.dataMask
 }
-
-// public int hasCode()
-// public boolean equals(Object o)

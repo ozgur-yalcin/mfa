@@ -60,8 +60,6 @@ func (this *PlanarYUVLuminanceSource) GetMatrix() []byte {
 	width := this.GetWidth()
 	height := this.GetHeight()
 
-	// If the caller asks for the entire underlying image, save the copy and give them the
-	// original data. The docs specifically warn that result.length must be ignored.
 	if width == this.dataWidth && height == this.dataHeight {
 		return this.yuvData
 	}
@@ -70,13 +68,11 @@ func (this *PlanarYUVLuminanceSource) GetMatrix() []byte {
 	matrix := make([]byte, area)
 	inputOffset := this.top*this.dataWidth + this.left
 
-	// If the width matches the full width of the underlying data, perform a single copy.
 	if width == this.dataWidth {
 		copy(matrix, this.yuvData[inputOffset:inputOffset+area])
 		return matrix
 	}
 
-	// Otherwise copy one cropped row at a time.
 	for y := 0; y < height; y++ {
 		outputOffset := y * width
 		copy(matrix[outputOffset:], this.yuvData[inputOffset:inputOffset+width])
@@ -119,12 +115,10 @@ func (this *PlanarYUVLuminanceSource) RenderThumbnail() []uint {
 	return pixels
 }
 
-// GetThumbnailWidth return width of image from {@link #renderThumbnail()}
 func (this *PlanarYUVLuminanceSource) GetThumbnailWidth() int {
 	return this.GetWidth() / thumbnailScaleFactor
 }
 
-// GetThumbnailHeight return height of image from {@link #renderThumbnail()}
 func (this *PlanarYUVLuminanceSource) GetThumbnailHeight() int {
 	return this.GetHeight() / thumbnailScaleFactor
 }

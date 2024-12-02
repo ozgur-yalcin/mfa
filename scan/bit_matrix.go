@@ -350,9 +350,6 @@ func (b *BitMatrix) GetRowSize() int {
 	return b.rowSize
 }
 
-//  public boolean equals(Object o)
-//  public int hashCode()
-
 func (b *BitMatrix) String() string {
 	return b.ToString("X ", "  ")
 }
@@ -388,5 +385,3 @@ func (b *BitMatrix) ToStringWithLineSeparator(setString, unsetString, lineSepara
 	}
 	return string(result)
 }
-
-//  public BitMatrix clone()

@@ -250,7 +250,6 @@ func (f *FinderPatternFinder) CrossCheckVertical(startI, centerJ, maxCount, orig
 	maxI := image.GetHeight()
 	stateCount := f.GetCrossCheckStateCount()
 
-	// Start counting up from center
 	i := startI
 
 	for i >= 0 && image.Get(centerJ, i) {
@@ -276,7 +275,6 @@ func (f *FinderPatternFinder) CrossCheckVertical(startI, centerJ, maxCount, orig
 		return math.NaN()
 	}
 
-	// Now also count down from center
 	i = startI + 1
 	for i < maxI && image.Get(centerJ, i) {
 		stateCount[2]++
@@ -451,16 +449,12 @@ func (f *FinderPatternFinder) HaveMultiplyConfirmedCenters() bool {
 	return totalDeviation <= 0.05*totalModuleSize
 }
 
-// squaredDistance get square of distance between a and b.
 func squaredDistance(a, b *FinderPattern) float64 {
 	x := a.GetX() - b.GetX()
 	y := a.GetY() - b.GetY()
 	return x*x + y*y
 }
 
-// SelectBestPatterns return the 3 best {@link FinderPattern}s from our list of candidates.
-// The "best" are those have similar module size and form a shape closer to a isosceles right triangle.
-// @throws NotFoundException if 3 such finder patterns do not exist
 func (f *FinderPatternFinder) SelectBestPatterns() ([]*FinderPattern, scan.NotFoundException) {
 	startSize := float64(len(f.possibleCenters))
 	if startSize < 3 {
@@ -484,7 +478,6 @@ func (f *FinderPatternFinder) SelectBestPatterns() ([]*FinderPattern, scan.NotFo
 				fpk := f.possibleCenters[k]
 				maxModuleSize := fpk.GetEstimatedModuleSize()
 				if maxModuleSize > minModuleSize*1.4 {
-					// module size is not similar
 					continue
 				}
 
@@ -492,7 +485,6 @@ func (f *FinderPatternFinder) SelectBestPatterns() ([]*FinderPattern, scan.NotFo
 				b := squaredDistance(fpj, fpk)
 				c := squaredDistance(fpi, fpk)
 
-				// sorts ascending - inlined
 				if a < b {
 					if b > c {
 						if a < c {
@@ -513,11 +505,6 @@ func (f *FinderPatternFinder) SelectBestPatterns() ([]*FinderPattern, scan.NotFo
 					}
 				}
 
-				// a^2 + b^2 = c^2 (Pythagorean theorem), and a = b (isosceles triangle).
-				// Since any right triangle satisfies the formula c^2 - b^2 - a^2 = 0,
-				// we need to check both two equal sides separately.
-				// The value of |c^2 - 2 * b^2| + |c^2 - 2 * a^2| increases as dissimilarity
-				// from isosceles right triangle.
 				d := math.Abs(c-2*b) + math.Abs(c-2*a)
 				if d < distortion {
 					distortion = d
@@ -536,7 +523,6 @@ func (f *FinderPatternFinder) SelectBestPatterns() ([]*FinderPattern, scan.NotFo
 	return bestPatterns, nil
 }
 
-// estimatedModuleComparator Orders by FinderPatternFinder#getEstimatedModuleSize()
 func estimatedModuleComparator(patterns []*FinderPattern) func(int, int) bool {
 	return func(i, j int) bool {
 		return patterns[j].GetEstimatedModuleSize() > patterns[i].GetEstimatedModuleSize()

@@ -37,11 +37,8 @@ func (this *AlignmentPatternFinder) Find() (*AlignmentPattern, scan.NotFoundExce
 	height := this.height
 	maxJ := startX + this.width
 	middleI := this.startY + (this.height / 2)
-	// We are looking for black/white/black modules in 1:1:1 ratio;
-	// this tracks the number of black/white/black modules seen so far
 	stateCount := make([]int, 3)
 	for iGen := 0; iGen < height; iGen++ {
-		// Search from middle outwards
 		i := middleI
 		if iGen&1 == 0 {
 			i += (iGen + 1) / 2
@@ -52,21 +49,17 @@ func (this *AlignmentPatternFinder) Find() (*AlignmentPattern, scan.NotFoundExce
 		stateCount[1] = 0
 		stateCount[2] = 0
 		j := startX
-		// Burn off leading white pixels before anything else; if we start in the middle of
-		// a white run, it doesn't make sense to count its length, since we don't know if the
-		// white run continued to the left of the start point
 		for j < maxJ && !this.image.Get(j, i) {
 			j++
 		}
 		currentState := 0
 		for j < maxJ {
 			if this.image.Get(j, i) {
-				// Black pixel
-				if currentState == 1 { // Counting black pixels
+				if currentState == 1 {
 					stateCount[1]++
-				} else { // Counting white pixels
-					if currentState == 2 { // A winner?
-						if this.foundPatternCross(stateCount) { // Yes
+				} else {
+					if currentState == 2 {
+						if this.foundPatternCross(stateCount) {
 							confirmed := this.handlePossibleCenter(stateCount, i, j)
 							if confirmed != nil {
 								return confirmed, nil
@@ -81,8 +74,8 @@ func (this *AlignmentPatternFinder) Find() (*AlignmentPattern, scan.NotFoundExce
 						stateCount[currentState]++
 					}
 				}
-			} else { // White pixel
-				if currentState == 1 { // Counting black pixels
+			} else {
+				if currentState == 1 {
 					currentState++
 				}
 				stateCount[currentState]++
@@ -98,8 +91,6 @@ func (this *AlignmentPatternFinder) Find() (*AlignmentPattern, scan.NotFoundExce
 
 	}
 
-	// Hmm, nothing we saw was observed and confirmed twice. If we had
-	// any guess at all, return it.
 	if len(this.possibleCenters) > 0 {
 		return this.possibleCenters[0], nil
 	}
@@ -131,13 +122,11 @@ func (this *AlignmentPatternFinder) crossCheckVertical(startI, centerJ, maxCount
 	stateCount[1] = 0
 	stateCount[2] = 0
 
-	// Start counting up from center
 	i := startI
 	for i >= 0 && image.Get(centerJ, i) && stateCount[1] <= maxCount {
 		stateCount[1]++
 		i--
 	}
-	// If already too many modules in this state or ran off the edge:
 	if i < 0 || stateCount[1] > maxCount {
 		return math.NaN()
 	}
@@ -149,7 +138,6 @@ func (this *AlignmentPatternFinder) crossCheckVertical(startI, centerJ, maxCount
 		return math.NaN()
 	}
 
-	// Now also count down from center
 	i = startI + 1
 	for i < maxI && image.Get(centerJ, i) && stateCount[1] <= maxCount {
 		stateCount[1]++
@@ -192,7 +180,6 @@ func (this *AlignmentPatternFinder) handlePossibleCenter(stateCount []int, i, j 
 				return center.CombineEstimate(centerI, centerJ, estimatedModuleSize)
 			}
 		}
-		// Hadn't found this before; save it
 		point := NewAlignmentPattern(centerJ, centerI, estimatedModuleSize)
 		this.possibleCenters = append(this.possibleCenters, point)
 		if this.resultPointCallback != nil {

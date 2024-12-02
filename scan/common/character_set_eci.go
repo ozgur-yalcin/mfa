@@ -37,7 +37,7 @@ var (
 	//CharacterSetECI_ISO8859_8  = newCharsetECI([]int{10}, charmap.ISO8859_8, "ISO-8859-8", "ISO8859_8")
 	CharacterSetECI_ISO8859_9 = newCharsetECI([]int{11}, charmap.ISO8859_9, "ISO-8859-9", "ISO8859_9")
 	//CharacterSetECI_ISO8859_10 = newCharsetECI([]int{12}, charmap.ISO8859_10, "ISO-8859-10", "ISO8859_10")
-	//CharacterSetECI_ISO8859_11 = newCharsetECI([]int{13}, charmap.ISO8859_11, "TIS-620", "ISO-8859-11", "ISO8859_11") // golang does not support
+	//CharacterSetECI_ISO8859_11 = newCharsetECI([]int{13}, charmap.ISO8859_11, "TIS-620", "ISO-8859-11", "ISO8859_11")
 
 	CharacterSetECI_ISO8859_13 = newCharsetECI([]int{15}, charmap.ISO8859_13, "ISO-8859-13", "ISO8859_13")
 	//CharacterSetECI_ISO8859_14         = newCharsetECI([]int{16}, charmap.ISO8859_14, "ISO-8859-14", "ISO8859_14")
@@ -52,7 +52,7 @@ var (
 	CharacterSetECI_UTF8               = newCharsetECI([]int{26}, unicode.UTF8, "UTF-8", "UTF8")
 	CharacterSetECI_ASCII              = newCharsetECI([]int{27, 170}, asciiEnc, "ASCII", "US-ASCII")
 	CharacterSetECI_Big5               = newCharsetECI([]int{28}, traditionalchinese.Big5, "Big5")
-	CharacterSetECI_GB18030            = newCharsetECI([]int{29}, simplifiedchinese.GB18030, "GB18030", "GB2312", "EUC_CN", "GBK") // BG18030 is upward compatible with others
+	CharacterSetECI_GB18030            = newCharsetECI([]int{29}, simplifiedchinese.GB18030, "GB18030", "GB2312", "EUC_CN", "GBK")
 	CharacterSetECI_EUC_KR             = newCharsetECI([]int{30}, korean.EUCKR, "EUC-KR", "EUC_KR")
 )
 

@@ -5,10 +5,10 @@ import errors "golang.org/x/xerrors"
 type ErrorCorrectionLevel int
 
 const (
-	ErrorCorrectionLevel_L ErrorCorrectionLevel = 0x01 // ~7% correction
-	ErrorCorrectionLevel_M ErrorCorrectionLevel = 0x00 // ~15% correction
-	ErrorCorrectionLevel_Q ErrorCorrectionLevel = 0x03 // ~25% correction
-	ErrorCorrectionLevel_H ErrorCorrectionLevel = 0x02 // ~30% correction
+	ErrorCorrectionLevel_L ErrorCorrectionLevel = 0x01
+	ErrorCorrectionLevel_M ErrorCorrectionLevel = 0x00
+	ErrorCorrectionLevel_Q ErrorCorrectionLevel = 0x03
+	ErrorCorrectionLevel_H ErrorCorrectionLevel = 0x02
 )
 
 func ErrorCorrectionLevel_ForBits(bits uint) (ErrorCorrectionLevel, error) {

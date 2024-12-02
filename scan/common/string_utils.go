@@ -15,16 +15,15 @@ import (
 
 const (
 	StringUtils_ASSUME_SHIFT_JIS = false
-	// Retained for ABI compatibility with earlier versions
-	StringUtils_SHIFT_JIS = "SJIS"
-	StringUtils_GB2312    = "GB2312"
+	StringUtils_SHIFT_JIS        = "SJIS"
+	StringUtils_GB2312           = "GB2312"
 )
 
 var (
 	StringUtils_PLATFORM_DEFAULT_ENCODING = unicode.UTF8
-	StringUtils_SHIFT_JIS_CHARSET         = japanese.ShiftJIS         // "SJIS"
-	StringUtils_GB2312_CHARSET            = simplifiedchinese.GB18030 // "GB2312"
-	StringUtils_EUC_JP                    = japanese.EUCJP            // "EUC_JP"
+	StringUtils_SHIFT_JIS_CHARSET         = japanese.ShiftJIS
+	StringUtils_GB2312_CHARSET            = simplifiedchinese.GB18030
+	StringUtils_EUC_JP                    = japanese.EUCJP
 )
 
 func StringUtils_guessEncoding(bytes []byte, hints map[scan.DecodeHintType]interface{}) (string, error) {
@@ -55,7 +54,6 @@ func StringUtils_guessCharset(bytes []byte, hints map[scan.DecodeHintType]interf
 		return ianaindex.IANA.Encoding(name)
 	}
 
-	// First try UTF-16, assuming anything with its BOM is UTF-16
 	if len(bytes) > 2 {
 		if bytes[0] == 0xfe && bytes[1] == 0xff {
 			return unicode.UTF16(unicode.BigEndian, unicode.UseBOM), nil
@@ -65,8 +63,6 @@ func StringUtils_guessCharset(bytes []byte, hints map[scan.DecodeHintType]interf
 		}
 	}
 
-	// For now, merely tries to distinguish ISO-8859-1, UTF-8 and Shift_JIS,
-	// which should be by far the most common encodings.
 	length := len(bytes)
 	canBeISO88591 := true
 	canBeShiftJIS := true
@@ -92,7 +88,6 @@ func StringUtils_guessCharset(bytes []byte, hints map[scan.DecodeHintType]interf
 
 		value := bytes[i] & 0xFF
 
-		// UTF-8 stuff
 		if canBeUTF8 {
 			if utf8BytesLeft > 0 {
 				if (value & 0x80) == 0 {
@@ -124,7 +119,6 @@ func StringUtils_guessCharset(bytes []byte, hints map[scan.DecodeHintType]interf
 			}
 		}
 
-		// ISO-8859-1 stuff
 		if canBeISO88591 {
 			if value > 0x7F && value < 0xA0 {
 				canBeISO88591 = false
@@ -133,7 +127,6 @@ func StringUtils_guessCharset(bytes []byte, hints map[scan.DecodeHintType]interf
 			}
 		}
 
-		// Shift_JIS stuff
 		if canBeShiftJIS {
 			if sjisBytesLeft > 0 {
 				if value < 0x40 || value == 0x7F || value > 0xFC {
@@ -173,19 +166,12 @@ func StringUtils_guessCharset(bytes []byte, hints map[scan.DecodeHintType]interf
 		canBeShiftJIS = false
 	}
 
-	// Easy -- if there is BOM or at least 1 valid not-single byte character (and no evidence it can't be UTF-8), done
 	if canBeUTF8 && (utf8bom || utf2BytesChars+utf3BytesChars+utf4BytesChars > 0) {
 		return unicode.UTF8, nil
 	}
-	// Easy -- if assuming Shift_JIS or at least 3 valid consecutive not-ascii characters (and no evidence it can't be), done
 	if canBeShiftJIS && (sjisMaxKatakanaWordLength >= 3 || sjisMaxDoubleBytesWordLength >= 3) {
 		return StringUtils_SHIFT_JIS_CHARSET, nil
 	}
-	// Distinguishing Shift_JIS and ISO-8859-1 can be a little tough for short words. The crude heuristic is:
-	// - If we saw
-	//   - only two consecutive katakana chars in the whole text, or
-	//   - at least 10% of bytes that could be "upper" not-alphanumeric Latin1,
-	// - then we conclude Shift_JIS, else ISO-8859-1
 	if canBeISO88591 && canBeShiftJIS {
 		if (sjisMaxKatakanaWordLength == 2 && sjisKatakanaChars == 2) || isoHighOther*10 >= length {
 			return StringUtils_SHIFT_JIS_CHARSET, nil
@@ -193,7 +179,6 @@ func StringUtils_guessCharset(bytes []byte, hints map[scan.DecodeHintType]interf
 		return charmap.ISO8859_1, nil
 	}
 
-	// Otherwise, try in order ISO-8859-1, Shift JIS, UTF-8 and fall back to default platform encoding
 	if canBeISO88591 {
 		return charmap.ISO8859_1, nil
 	}
@@ -203,6 +188,5 @@ func StringUtils_guessCharset(bytes []byte, hints map[scan.DecodeHintType]interf
 	if canBeUTF8 {
 		return unicode.UTF8, nil
 	}
-	// Otherwise, we take a wild guess with platform encoding
 	return StringUtils_PLATFORM_DEFAULT_ENCODING, nil
 }

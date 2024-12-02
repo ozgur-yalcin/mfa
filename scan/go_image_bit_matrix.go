@@ -5,8 +5,6 @@ import (
 	"image/color"
 )
 
-// implement image.Image for Go
-
 func (img *BitMatrix) ColorModel() color.Model {
 	return color.GrayModel
 }

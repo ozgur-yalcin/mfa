@@ -22,7 +22,6 @@ func NewLuminanceSourceFromImage(img image.Image) LuminanceSource {
 
 	luminance := make([]byte, width*height)
 	index := 0
-	// Optimize special cases.
 	switch img := img.(type) {
 	case *image.Gray:
 		for y := rect.Min.Y; y < rect.Max.Y; y++ {

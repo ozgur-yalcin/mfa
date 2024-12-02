@@ -7,12 +7,12 @@ import (
 )
 
 var (
-	GenericGF_AZTEC_DATA_12         = NewGenericGF(0x1069, 4096, 1) // x^12 + x^6 + x^5 + x^3 + 1
-	GenericGF_AZTEC_DATA_10         = NewGenericGF(0x409, 1024, 1)  // x^10 + x^3 + 1
-	GenericGF_AZTEC_DATA_6          = NewGenericGF(0x43, 64, 1)     // x^6 + x + 1
-	GenericGF_AZTEC_PARAM           = NewGenericGF(0x13, 16, 1)     // x^4 + x + 1
-	GenericGF_QR_CODE_FIELD_256     = NewGenericGF(0x011D, 256, 0)  // x^8 + x^4 + x^3 + x^2 + 1
-	GenericGF_DATA_MATRIX_FIELD_256 = NewGenericGF(0x012D, 256, 1)  // x^8 + x^5 + x^3 + x^2 + 1
+	GenericGF_AZTEC_DATA_12         = NewGenericGF(0x1069, 4096, 1)
+	GenericGF_AZTEC_DATA_10         = NewGenericGF(0x409, 1024, 1)
+	GenericGF_AZTEC_DATA_6          = NewGenericGF(0x43, 64, 1)
+	GenericGF_AZTEC_PARAM           = NewGenericGF(0x13, 16, 1)
+	GenericGF_QR_CODE_FIELD_256     = NewGenericGF(0x011D, 256, 0)
+	GenericGF_DATA_MATRIX_FIELD_256 = NewGenericGF(0x012D, 256, 1)
 	GenericGF_AZTEC_DATA_8          = GenericGF_DATA_MATRIX_FIELD_256
 	GenericGF_MAXICODE_FIELD_64     = GenericGF_AZTEC_DATA_6
 )
@@ -39,7 +39,7 @@ func NewGenericGF(primitive, size, b int) *GenericGF {
 	x := 1
 	for i := 0; i < size; i++ {
 		expTable[i] = x
-		x *= 2 // we're assuming the generator alpha is 2
+		x *= 2
 		if x >= size {
 			x ^= primitive
 			x &= size - 1
@@ -50,7 +50,6 @@ func NewGenericGF(primitive, size, b int) *GenericGF {
 	}
 	this.expTable = expTable
 	this.logTable = logTable
-	// logTable[0] == 0 but this should never be used
 	this.zero, _ = NewGenericGFPoly(this, []int{0})
 	this.one, _ = NewGenericGFPoly(this, []int{1})
 

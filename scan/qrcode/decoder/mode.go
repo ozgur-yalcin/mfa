@@ -8,17 +8,16 @@ type Mode struct {
 }
 
 var (
-	Mode_TERMINATOR           = NewMode([]int{0, 0, 0}, 0x00) // Not really a mode...
+	Mode_TERMINATOR           = NewMode([]int{0, 0, 0}, 0x00)
 	Mode_NUMERIC              = NewMode([]int{10, 12, 14}, 0x01)
 	Mode_ALPHANUMERIC         = NewMode([]int{9, 11, 13}, 0x02)
-	Mode_STRUCTURED_APPEND    = NewMode([]int{0, 0, 0}, 0x03) // Not supported
+	Mode_STRUCTURED_APPEND    = NewMode([]int{0, 0, 0}, 0x03)
 	Mode_BYTE                 = NewMode([]int{8, 16, 16}, 0x04)
-	Mode_ECI                  = NewMode([]int{0, 0, 0}, 0x07) // character counts don't apply
+	Mode_ECI                  = NewMode([]int{0, 0, 0}, 0x07)
 	Mode_KANJI                = NewMode([]int{8, 10, 12}, 0x08)
 	Mode_FNC1_FIRST_POSITION  = NewMode([]int{0, 0, 0}, 0x05)
 	Mode_FNC1_SECOND_POSITION = NewMode([]int{0, 0, 0}, 0x09)
-	/** See GBT 18284-2000; "Hanzi" is a transliteration of this mode name. */
-	Mode_HANZI = NewMode([]int{8, 10, 12}, 0x0D)
+	Mode_HANZI                = NewMode([]int{8, 10, 12}, 0x0D)
 )
 
 func NewMode(characterCountBitsForVersions []int, bits int) *Mode {
@@ -46,7 +45,6 @@ func ModeForBits(bits int) (*Mode, error) {
 	case 0x9:
 		return Mode_FNC1_SECOND_POSITION, nil
 	case 0xD:
-		// 0xD is defined in GBT 18284-2000, may not be supported in foreign country
 		return Mode_HANZI, nil
 	default:
 		return nil, errors.New("IllegalArgumentException")

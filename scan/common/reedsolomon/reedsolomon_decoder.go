@@ -64,7 +64,6 @@ func (this *ReedSolomonDecoder) Decode(received []int, twoS int) ReedSolomonExce
 }
 
 func (this *ReedSolomonDecoder) runEuclideanAlgorithm(a, b *GenericGFPoly, R int) (sigma, omega *GenericGFPoly, e error) {
-	// Assume a's degree is >= b's
 	if a.GetDegree() < b.GetDegree() {
 		a, b = b, a
 	}
@@ -74,16 +73,13 @@ func (this *ReedSolomonDecoder) runEuclideanAlgorithm(a, b *GenericGFPoly, R int
 	tLast := this.field.GetZero()
 	t := this.field.GetOne()
 
-	// Run Euclidean algorithm until r's degree is less than R/2
 	for 2*r.GetDegree() >= R {
 		rLastLast := rLast
 		tLastLast := tLast
 		rLast = r
 		tLast = t
 
-		// Divide rLastLast by rLast, with quotient in q and remainder in r
 		if rLast.IsZero() {
-			// Oops, Euclidean algorithm already terminated?
 			return nil, nil, NewReedSolomonException("r_{i-1} was zero")
 		}
 		r = rLastLast
@@ -143,9 +139,8 @@ func (this *ReedSolomonDecoder) runEuclideanAlgorithm(a, b *GenericGFPoly, R int
 }
 
 func (this *ReedSolomonDecoder) findErrorLocations(errorLocator *GenericGFPoly) ([]int, error) {
-	// This is a direct application of Chien's search
 	numErrors := errorLocator.GetDegree()
-	if numErrors == 1 { // shortcut
+	if numErrors == 1 {
 		return []int{errorLocator.GetCoefficient(1)}, nil
 	}
 	result := make([]int, numErrors)
@@ -167,7 +162,6 @@ func (this *ReedSolomonDecoder) findErrorLocations(errorLocator *GenericGFPoly) 
 }
 
 func (this *ReedSolomonDecoder) findErrorMagnitudes(errorEvaluator *GenericGFPoly, errorLocations []int) ([]int, error) {
-	// This is directly applying Forney's Formula
 	s := len(errorLocations)
 	result := make([]int, s)
 	for i := 0; i < s; i++ {
@@ -178,10 +172,6 @@ func (this *ReedSolomonDecoder) findErrorMagnitudes(errorEvaluator *GenericGFPol
 		denominator := 1
 		for j := 0; j < s; j++ {
 			if i != j {
-				//denominator = field.multiply(denominator,
-				//    GenericGF.addOrSubtract(1, field.multiply(errorLocations[j], xiInverse)));
-				// Above should work but fails on some Apple and Linux JDKs due to a Hotspot bug.
-				// Below is a funny-looking workaround from Steven Parkes
 				term := this.field.Multiply(errorLocations[j], xiInverse)
 				var termPlus1 int
 				if (term & 0x1) == 0 {

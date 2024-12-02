@@ -16,21 +16,18 @@ import (
 )
 
 var (
-	Encoder_DEFAULT_BYTE_MODE_ENCODING textencoding.Encoding = unicode.UTF8 // original default is "ISO-8859-1"
+	Encoder_DEFAULT_BYTE_MODE_ENCODING textencoding.Encoding = unicode.UTF8
 )
 
 var alphanumericTable = []int{
-	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, // 0x00-0x0f
-	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, // 0x10-0x1f
-	36, -1, -1, -1, 37, 38, -1, -1, -1, -1, 39, 40, -1, 41, 42, 43, // 0x20-0x2f
-	0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 44, -1, -1, -1, -1, -1, // 0x30-0x3f
-	-1, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, // 0x40-0x4f
-	25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, -1, -1, -1, -1, -1, // 0x50-0x5f
+	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+	36, -1, -1, -1, 37, 38, -1, -1, -1, -1, 39, 40, -1, 41, 42, 43,
+	0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 44, -1, -1, -1, -1, -1,
+	-1, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24,
+	25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, -1, -1, -1, -1, -1,
 }
 
-// calculateMaskPenalty The mask penalty calculation is complicated.
-// See Table 21 of JISX0510:2004 (p.45) for details.
-// Basically it applies four rules and summate all penalties.
 func calculateMaskPenalty(matrix *ByteMatrix) int {
 	return MaskUtil_applyMaskPenaltyRule1(matrix) +
 		MaskUtil_applyMaskPenaltyRule2(matrix) +
@@ -43,7 +40,6 @@ func Encoder_encodeWithoutHint(content string, ecLevel decoder.ErrorCorrectionLe
 }
 
 func Encoder_encode(content string, ecLevel decoder.ErrorCorrectionLevel, hints map[scan.EncodeHintType]interface{}) (*QRCode, scan.WriterException) {
-	// Determine what character encoding has been specified by the caller, if any
 	encoding := Encoder_DEFAULT_BYTE_MODE_ENCODING
 	encodingHint, hasEncodingHint := hints[scan.EncodeHintType_CHARACTER_SET]
 	if hasEncodingHint {
@@ -54,15 +50,10 @@ func Encoder_encode(content string, ecLevel decoder.ErrorCorrectionLevel, hints 
 		}
 	}
 
-	// Pick an encoding mode appropriate for the content. Note that this will not attempt to use
-	// multiple modes / segments even if that were more efficient. Twould be nice.
 	mode := chooseMode(content, encoding)
 
-	// This will store the header information, like mode and
-	// length, as well as "header" segments like an ECI segment.
 	headerBits := scan.NewEmptyBitArray()
 
-	// Append ECI segment if applicable
 	if mode == decoder.Mode_BYTE && hasEncodingHint {
 		eci, ok := common.GetCharacterSetECI(encoding)
 		if ok && eci != nil {
@@ -70,7 +61,6 @@ func Encoder_encode(content string, ecLevel decoder.ErrorCorrectionLevel, hints 
 		}
 	}
 
-	// Append the FNC1 mode header for GS1 formatted data if applicable
 	gs1FormatHint, hasGS1FormatHint := hints[scan.EncodeHintType_GS1_FORMAT]
 	if hasGS1FormatHint {
 		appendGS1, ok := gs1FormatHint.(bool)
@@ -81,16 +71,12 @@ func Encoder_encode(content string, ecLevel decoder.ErrorCorrectionLevel, hints 
 			}
 		}
 		if appendGS1 {
-			// GS1 formatted codes are prefixed with a FNC1 in first position mode header
 			appendModeInfo(decoder.Mode_FNC1_FIRST_POSITION, headerBits)
 		}
 	}
 
-	// (With ECI in place,) Write the mode marker
 	appendModeInfo(mode, headerBits)
 
-	// Collect data within the main segment, separately, to count its size if needed. Don't add it to
-	// main payload yet.
 	dataBits := scan.NewEmptyBitArray()
 	e := appendBytes(content, mode, dataBits, encoding)
 	if e != nil {
@@ -123,7 +109,6 @@ func Encoder_encode(content string, ecLevel decoder.ErrorCorrectionLevel, hints 
 
 	headerAndDataBits := scan.NewEmptyBitArray()
 	headerAndDataBits.AppendBitArray(headerBits)
-	// Find "length" of main segment and write it
 	numLetters := len(content)
 	if mode == decoder.Mode_BYTE {
 		numLetters = dataBits.GetSizeInBytes()
@@ -135,19 +120,16 @@ func Encoder_encode(content string, ecLevel decoder.ErrorCorrectionLevel, hints 
 	if e != nil {
 		return nil, e
 	}
-	// Put data together into the overall payload
 	headerAndDataBits.AppendBitArray(dataBits)
 
 	ecBlocks := version.GetECBlocksForLevel(ecLevel)
 	numDataBytes := version.GetTotalCodewords() - ecBlocks.GetTotalECCodewords()
 
-	// Terminate the bits properly.
 	e = terminateBits(numDataBytes, headerAndDataBits)
 	if e != nil {
 		return nil, e
 	}
 
-	// Interleave data bits with error correction code.
 	finalBits, e := interleaveWithECBytes(
 		headerAndDataBits, version.GetTotalCodewords(), numDataBytes, ecBlocks.GetNumBlocks())
 	if e != nil {
@@ -160,11 +142,9 @@ func Encoder_encode(content string, ecLevel decoder.ErrorCorrectionLevel, hints 
 	qrCode.SetMode(mode)
 	qrCode.SetVersion(version)
 
-	//  Choose the mask pattern and set to "qrCode".
 	dimension := version.GetDimensionForVersion()
 	matrix := NewByteMatrix(dimension, dimension)
 
-	// Enable manual selection of the pattern to be used via hint
 	maskPattern := -1
 	if hintMaskPattern, ok := hints[scan.EncodeHintType_QR_MASK_PATTERN]; ok {
 		switch mask := hintMaskPattern.(type) {
@@ -188,20 +168,14 @@ func Encoder_encode(content string, ecLevel decoder.ErrorCorrectionLevel, hints 
 	}
 	qrCode.SetMaskPattern(maskPattern)
 
-	// Build the matrix and set it to "qrCode".
 	_ = MatrixUtil_buildMatrix(finalBits, ecLevel, version, maskPattern, matrix)
 	qrCode.SetMatrix(matrix)
 
 	return qrCode, nil
 }
 
-// recommendVersion  Decides the smallest version of QR code that will contain all of the provided data.
-// @throws WriterException if the data cannot fit in any version
 func recommendVersion(ecLevel decoder.ErrorCorrectionLevel, mode *decoder.Mode,
 	headerBits *scan.BitArray, dataBits *scan.BitArray) (*decoder.Version, scan.WriterException) {
-	// Hard part: need to know version to know how many bits length takes. But need to know how many
-	// bits it takes to know version. First we take a guess at version by assuming version will be
-	// the minimum, 1:
 	version1, _ := decoder.Version_GetVersionForNumber(1)
 	provisionalBitsNeeded := calculateBitsNeeded(mode, headerBits, dataBits, version1)
 	provisionalVersion, e := chooseVersion(provisionalBitsNeeded, ecLevel)
@@ -209,7 +183,6 @@ func recommendVersion(ecLevel decoder.ErrorCorrectionLevel, mode *decoder.Mode,
 		return nil, e
 	}
 
-	// Use that guess to calculate the right version. I am still not sure this works in 100% of cases.
 	bitsNeeded := calculateBitsNeeded(mode, headerBits, dataBits, provisionalVersion)
 	return chooseVersion(bitsNeeded, ecLevel)
 }
@@ -222,8 +195,6 @@ func calculateBitsNeeded(
 	return headerBits.GetSize() + mode.GetCharacterCountBits(version) + dataBits.GetSize()
 }
 
-// getAlphanumericCode returns the code point of the table used in alphanumeric mode or
-// if there is no corresponding code in the table.
 func getAlphanumericCode(code uint8) int {
 	if int(code) < len(alphanumericTable) {
 		return alphanumericTable[code]
@@ -231,11 +202,8 @@ func getAlphanumericCode(code uint8) int {
 	return -1
 }
 
-// chooseMode Choose the best mode by examining the content. Note that 'encoding' is used as a hint;
-// if it is Shift_JIS, and the input is only double-byte Kanji, then we return {@link Mode#KANJI}.
 func chooseMode(content string, encoding textencoding.Encoding) *decoder.Mode {
 	if common.StringUtils_SHIFT_JIS_CHARSET == encoding && isOnlyDoubleByteKanji(content) {
-		// Choose Kanji mode if all input are double-byte characters
 		return decoder.Mode_KANJI
 	}
 	hasNumeric := false
@@ -282,9 +250,8 @@ func isOnlyDoubleByteKanji(content string) bool {
 func chooseMaskPattern(bits *scan.BitArray, ecLevel decoder.ErrorCorrectionLevel,
 	version *decoder.Version, matrix *ByteMatrix) (int, scan.WriterException) {
 
-	minPenalty := math.MaxInt32 // Lower penalty is better.
+	minPenalty := math.MaxInt32
 	bestMaskPattern := -1
-	// We try all mask patterns to choose the best one.
 	for maskPattern := 0; maskPattern < QRCode_NUM_MASK_PATERNS; maskPattern++ {
 		e := MatrixUtil_buildMatrix(bits, ecLevel, version, maskPattern, matrix)
 		if e != nil {
@@ -309,22 +276,15 @@ func chooseVersion(numInputBits int, ecLevel decoder.ErrorCorrectionLevel) (*dec
 	return nil, scan.NewWriterException("Data too big")
 }
 
-// willFit returns true if the number of input bits will fit in a code with the specified version and
-// error correction level.
 func willFit(numInputBits int, version *decoder.Version, ecLevel decoder.ErrorCorrectionLevel) bool {
-	// In the following comments, we use numbers of Version 7-H.
-	// numBytes = 196
 	numBytes := version.GetTotalCodewords()
-	// getNumECBytes = 130
 	ecBlocks := version.GetECBlocksForLevel(ecLevel)
 	numEcBytes := ecBlocks.GetTotalECCodewords()
-	// getNumDataBytes = 196 - 130 = 66
 	numDataBytes := numBytes - numEcBytes
 	totalInputBytes := (numInputBits + 7) / 8
 	return numDataBytes >= totalInputBytes
 }
 
-// terminateBits Terminate bits as described in 8.4.8 and 8.4.9 of JISX0510:2004 (p.24).
 func terminateBits(numDataBytes int, bits *scan.BitArray) scan.WriterException {
 	capacity := numDataBytes * 8
 	if bits.GetSize() > capacity {
@@ -334,15 +294,12 @@ func terminateBits(numDataBytes int, bits *scan.BitArray) scan.WriterException {
 	for i := 0; i < 4 && bits.GetSize() < capacity; i++ {
 		bits.AppendBit(false)
 	}
-	// Append termination bits. See 8.4.8 of JISX0510:2004 (p.24) for details.
-	// If the last byte isn't 8-bit aligned, we'll add padding bits.
 	numBitsInLastByte := bits.GetSize() & 0x07
 	if numBitsInLastByte > 0 {
 		for i := numBitsInLastByte; i < 8; i++ {
 			bits.AppendBit(false)
 		}
 	}
-	// If we have more space, we'll fill the space with padding patterns defined in 8.4.9 (p.24).
 	numPaddingBytes := numDataBytes - bits.GetSizeInBytes()
 	for i := 0; i < numPaddingBytes; i++ {
 		v := 0x11
@@ -357,40 +314,24 @@ func terminateBits(numDataBytes int, bits *scan.BitArray) scan.WriterException {
 	return nil
 }
 
-// getNumDataBytesAndNumECBytesForBlockID Get number of data bytes and number of
-// error correction bytes for block id "blockID".
-// Returns are "numDataBytesInBlock", and "numECBytesInBlock".
-// See table 12 in 8.5.1 of JISX0510:2004 (p.30)
 func getNumDataBytesAndNumECBytesForBlockID(numTotalBytes, numDataBytes, numRSBlocks, blockID int) (int, int, scan.WriterException) {
 	if blockID >= numRSBlocks {
 		return 0, 0, scan.NewWriterException("Block ID too large")
 	}
-	// numRsBlocksInGroup2 = 196 % 5 = 1
 	numRsBlocksInGroup2 := numTotalBytes % numRSBlocks
-	// numRsBlocksInGroup1 = 5 - 1 = 4
 	numRsBlocksInGroup1 := numRSBlocks - numRsBlocksInGroup2
-	// numTotalBytesInGroup1 = 196 / 5 = 39
 	numTotalBytesInGroup1 := numTotalBytes / numRSBlocks
-	// numTotalBytesInGroup2 = 39 + 1 = 40
 	numTotalBytesInGroup2 := numTotalBytesInGroup1 + 1
-	// numDataBytesInGroup1 = 66 / 5 = 13
 	numDataBytesInGroup1 := numDataBytes / numRSBlocks
-	// numDataBytesInGroup2 = 13 + 1 = 14
 	numDataBytesInGroup2 := numDataBytesInGroup1 + 1
-	// numEcBytesInGroup1 = 39 - 13 = 26
 	numEcBytesInGroup1 := numTotalBytesInGroup1 - numDataBytesInGroup1
-	// numEcBytesInGroup2 = 40 - 14 = 26
 	numEcBytesInGroup2 := numTotalBytesInGroup2 - numDataBytesInGroup2
-	// Sanity checks.
-	// 26 = 26
 	if numEcBytesInGroup1 != numEcBytesInGroup2 {
 		return 0, 0, scan.NewWriterException("EC bytes mismatch")
 	}
-	// 5 = 4 + 1.
 	if numRSBlocks != numRsBlocksInGroup1+numRsBlocksInGroup2 {
 		return 0, 0, scan.NewWriterException("RS blocks mismatch")
 	}
-	// 196 = (13 + 26) * 4 + (14 + 26) * 1
 	if numTotalBytes !=
 		((numDataBytesInGroup1+numEcBytesInGroup1)*numRsBlocksInGroup1)+
 			((numDataBytesInGroup2+numEcBytesInGroup2)*numRsBlocksInGroup2) {
@@ -403,23 +344,16 @@ func getNumDataBytesAndNumECBytesForBlockID(numTotalBytes, numDataBytes, numRSBl
 	return numDataBytesInGroup2, numEcBytesInGroup2, nil
 }
 
-// interleaveWithECBytes Interleave "bits" with corresponding error correction bytes.
-// On success, store the result in "result".
-// The interleave rule is complicated. See 8.6 of JISX0510:2004 (p.37) for details.
 func interleaveWithECBytes(bits *scan.BitArray, numTotalBytes, numDataBytes, numRSBlocks int) (*scan.BitArray, scan.WriterException) {
 
-	// "bits" must have "getNumDataBytes" bytes of data.
 	if bits.GetSizeInBytes() != numDataBytes {
 		return nil, scan.NewWriterException("Number of bits and data bytes does not match")
 	}
 
-	// Step 1.  Divide data bytes into blocks and generate error correction bytes for them. We'll
-	// store the divided data bytes blocks and error correction bytes blocks into "blocks".
 	dataBytesOffset := 0
 	maxNumDataBytes := 0
 	maxNumEcBytes := 0
 
-	// Since, we know the number of reedsolmon blocks, we can initialize the vector with the number.
 	blocks := make([]*BlockPair, 0)
 
 	for i := 0; i < numRSBlocks; i++ {
@@ -452,7 +386,6 @@ func interleaveWithECBytes(bits *scan.BitArray, numTotalBytes, numDataBytes, num
 
 	result := scan.NewEmptyBitArray()
 
-	// First, place data blocks.
 	for i := 0; i < maxNumDataBytes; i++ {
 		for _, block := range blocks {
 			dataBytes := block.GetDataBytes()
@@ -461,7 +394,6 @@ func interleaveWithECBytes(bits *scan.BitArray, numTotalBytes, numDataBytes, num
 			}
 		}
 	}
-	// Then, place error correction blocks.
 	for i := 0; i < maxNumEcBytes; i++ {
 		for _, block := range blocks {
 			ecBytes := block.GetErrorCorrectionBytes()
@@ -470,7 +402,7 @@ func interleaveWithECBytes(bits *scan.BitArray, numTotalBytes, numDataBytes, num
 			}
 		}
 	}
-	if numTotalBytes != result.GetSizeInBytes() { // Should be same.
+	if numTotalBytes != result.GetSizeInBytes() {
 		return nil, scan.NewWriterException(
 			"Interleaving error: %v  and %v differ", numTotalBytes, result.GetSizeInBytes())
 	}
@@ -496,12 +428,10 @@ func generateECBytes(dataBytes []byte, numEcBytesInBlock int) ([]byte, scan.Writ
 	return ecBytes, nil
 }
 
-// appendModeInfo Append mode info. On success, store the result in "bits".
 func appendModeInfo(mode *decoder.Mode, bits *scan.BitArray) {
 	_ = bits.AppendBits(mode.GetBits(), 4)
 }
 
-// appendLengthInfo Append length info. On success, store the result in "bits".
 func appendLengthInfo(numLetters int, version *decoder.Version, mode *decoder.Mode, bits *scan.BitArray) scan.WriterException {
 	numBits := mode.GetCharacterCountBits(version)
 	if numLetters >= (1 << uint(numBits)) {
@@ -512,9 +442,6 @@ func appendLengthInfo(numLetters int, version *decoder.Version, mode *decoder.Mo
 	return nil
 }
 
-// appendBytes Append "bytes" in "mode" mode (encoding) into "bits".
-//
-//	On success, store the result in "bits".
 func appendBytes(content string, mode *decoder.Mode, bits *scan.BitArray, encoding textencoding.Encoding) scan.WriterException {
 	switch mode {
 	case decoder.Mode_NUMERIC:
@@ -537,18 +464,15 @@ func appendNumericBytes(content string, bits *scan.BitArray) {
 	for i < length {
 		num1 := int(content[i]) - '0'
 		if i+2 < length {
-			// Encode three numeric letters in ten bits.
 			num2 := int(content[i+1]) - '0'
 			num3 := int(content[i+2]) - '0'
 			_ = bits.AppendBits(num1*100+num2*10+num3, 10)
 			i += 3
 		} else if i+1 < length {
-			// Encode two numeric letters in seven bits.
 			num2 := int(content[i+1]) - '0'
 			_ = bits.AppendBits(num1*10+num2, 7)
 			i += 2
 		} else {
-			// Encode one numeric letter in four bits.
 			_ = bits.AppendBits(num1, 4)
 			i++
 		}
@@ -568,11 +492,9 @@ func appendAlphanumericBytes(content string, bits *scan.BitArray) scan.WriterExc
 			if code2 == -1 {
 				return scan.NewWriterException("appendAlphanumericBytes")
 			}
-			// Encode two alphanumeric letters in 11 bits.
 			_ = bits.AppendBits(code1*45+code2, 11)
 			i += 2
 		} else {
-			// Encode one alphanumeric letter in six bits.
 			_ = bits.AppendBits(code1, 6)
 			i++
 		}
@@ -604,7 +526,7 @@ func appendKanjiBytes(content string, bits *scan.BitArray) scan.WriterException 
 	if len(bytes)%2 != 0 {
 		return scan.NewWriterException("Kanji byte size not even")
 	}
-	maxI := len(bytes) - 1 // bytes.length must be even
+	maxI := len(bytes) - 1
 	for i := 0; i < maxI; i += 2 {
 		byte1 := int(bytes[i]) & 0xFF
 		byte2 := int(bytes[i+1]) & 0xFF
@@ -626,6 +548,5 @@ func appendKanjiBytes(content string, bits *scan.BitArray) scan.WriterException 
 
 func appendECI(eci *common.CharacterSetECI, bits *scan.BitArray) {
 	_ = bits.AppendBits(decoder.Mode_ECI.GetBits(), 4)
-	// This is correct for values up to 127, which is all we need now.
 	_ = bits.AppendBits(eci.GetValue(), 8)
 }

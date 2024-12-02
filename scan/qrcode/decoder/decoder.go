@@ -34,7 +34,6 @@ func (this *Decoder) DecodeWithoutHint(bits *scan.BitMatrix) (*common.DecoderRes
 
 func (this *Decoder) Decode(bits *scan.BitMatrix, hints map[scan.DecodeHintType]interface{}) (*common.DecoderResult, error) {
 
-	// Construct a parser and read version, error-correction level
 	parser, e := NewBitMatrixParser(bits)
 	if e != nil {
 		return nil, scan.WrapFormatException(e)
@@ -51,28 +50,17 @@ func (this *Decoder) Decode(bits *scan.BitMatrix, hints map[scan.DecodeHintType]
 		fece = e.(scan.ReaderException)
 	}
 
-	// Revert the bit matrix
 	parser.Remask()
 
-	// Will be attempting a mirrored reading of the version and format info.
 	parser.SetMirror(true)
 
-	// Preemptively read the version.
 	_, e = parser.ReadVersion()
 
 	if e == nil {
-		// Preemptively read the format information.
 		_, e = parser.ReadFormatInformation()
 	}
 
 	if e == nil {
-		/*
-		 * Since we're here, this means we have successfully detected some kind
-		 * of version and format information when mirrored. This is a good sign,
-		 * that the QR code may be mirrored, and we should try once more with a
-		 * mirrored content.
-		 */
-		// Prepare for a mirrored reading.
 		parser.Mirror()
 	}
 
@@ -81,15 +69,12 @@ func (this *Decoder) Decode(bits *scan.BitMatrix, hints map[scan.DecodeHintType]
 	}
 
 	if e == nil {
-		// Success! Notify the caller that the code was mirrored.
 		result.SetOther(NewQRCodeDecoderMetaData(true))
 		return result, nil
 	}
 
-	// `e` is not nil
 	switch e.(type) {
 	case scan.FormatException, scan.ChecksumException:
-		// Throw the exception from the original reading
 		return nil, fece
 	default:
 		return nil, e
@@ -107,18 +92,15 @@ func (this *Decoder) decode(parser *BitMatrixParser, hints map[scan.DecodeHintTy
 	}
 	ecLevel := formatinfo.GetErrorCorrectionLevel()
 
-	// Read codewords
 	codewords, e := parser.ReadCodewords()
 	if e != nil {
 		return nil, scan.WrapFormatException(e)
 	}
-	// Separate into data blocks
 	dataBlocks, e := DataBlock_GetDataBlocks(codewords, version, ecLevel)
 	if e != nil {
 		return nil, scan.WrapFormatException(e)
 	}
 
-	// Count total number of data bytes
 	totalBytes := 0
 	for _, dataBlock := range dataBlocks {
 		totalBytes += dataBlock.GetNumDataCodewords()
@@ -126,7 +108,6 @@ func (this *Decoder) decode(parser *BitMatrixParser, hints map[scan.DecodeHintTy
 	resultBytes := make([]byte, totalBytes)
 	resultOffset := 0
 
-	// Error-correct and copy data blocks together into a stream of bytes
 	for _, dataBlock := range dataBlocks {
 		codewordBytes := dataBlock.GetCodewords()
 		numDataCodewords := dataBlock.GetNumDataCodewords()
@@ -140,13 +121,11 @@ func (this *Decoder) decode(parser *BitMatrixParser, hints map[scan.DecodeHintTy
 		}
 	}
 
-	// Decode the contents of that stream of bytes
 	return DecodedBitStreamParser_Decode(resultBytes, version, ecLevel, hints)
 }
 
 func (this *Decoder) correctErrors(codewordBytes []byte, numDataCodewords int) error {
 	numCodewords := len(codewordBytes)
-	// First read into an array of ints
 	codewordsInts := make([]int, numCodewords)
 	for i := 0; i < numCodewords; i++ {
 		codewordsInts[i] = int(codewordBytes[i] & 0xFF)
@@ -156,8 +135,6 @@ func (this *Decoder) correctErrors(codewordBytes []byte, numDataCodewords int) e
 	if e != nil {
 		return scan.WrapChecksumException(e)
 	}
-	// Copy back into array of bytes -- only need to worry about the bytes that were data
-	// We don't care about errors in the error-correction codewords
 	for i := 0; i < numDataCodewords; i++ {
 		codewordBytes[i] = byte(codewordsInts[i])
 	}

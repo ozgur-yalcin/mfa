@@ -239,9 +239,6 @@ func makeArray(size int) []uint32 {
 	return make([]uint32, (size+31)/32)
 }
 
-// equals()
-// hasCode()
-
 func (b *BitArray) String() string {
 	result := make([]byte, 0, b.size+(b.size/8)+1)
 	for i := 0; i < b.size; i++ {
@@ -256,5 +253,3 @@ func (b *BitArray) String() string {
 	}
 	return string(result)
 }
-
-// clone()

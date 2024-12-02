@@ -31,7 +31,6 @@ func (this *BitSource) ReadBits(numBits int) (int, error) {
 
 	result := 0
 
-	// First, read remainder from current byte
 	if this.bitOffset > 0 {
 		bitsLeft := 8 - this.bitOffset
 		toRead := bitsLeft
@@ -49,7 +48,6 @@ func (this *BitSource) ReadBits(numBits int) (int, error) {
 		}
 	}
 
-	// Next read whole bytes
 	if numBits > 0 {
 		for numBits >= 8 {
 			result = (result << 8) | int(this.bytes[this.byteOffset]&0xFF)
@@ -57,7 +55,6 @@ func (this *BitSource) ReadBits(numBits int) (int, error) {
 			numBits -= 8
 		}
 
-		// Finally read a partial byte
 		if numBits > 0 {
 			bitsToNotRead := uint(8 - numBits)
 			mask := byte((0xFF >> bitsToNotRead) << bitsToNotRead)

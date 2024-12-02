@@ -27,11 +27,6 @@ func (this *BinaryBitmap) GetBlackRow(y int, row *BitArray) (*BitArray, error) {
 }
 
 func (this *BinaryBitmap) GetBlackMatrix() (*BitMatrix, error) {
-	// The matrix is created on demand the first time it is requested, then cached. There are two
-	// reasons for this:
-	// 1. This work will never be done if the caller only installs 1D Reader objects, or if a
-	//    1D Reader finds a barcode before the 2D Readers run.
-	// 2. This work will only be done once even if the caller installs multiple 2D Readers.
 	if this.matrix == nil {
 		var e error
 		this.matrix, e = this.binarizer.GetBlackMatrix()

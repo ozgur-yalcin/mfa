@@ -66,19 +66,14 @@ func (this *Detector) ProcessFinderPatternInfo(info *FinderPatternInfo) (*common
 	modulesBetweenFPCenters := provisionalVersion.GetDimensionForVersion() - 7
 
 	var alignmentPattern *AlignmentPattern
-	// Anything above version 1 has an alignment pattern
 	if len(provisionalVersion.GetAlignmentPatternCenters()) > 0 {
-		// Guess where a "bottom right" finder pattern would have been
 		bottomRightX := topRight.GetX() - topLeft.GetX() + bottomLeft.GetX()
 		bottomRightY := topRight.GetY() - topLeft.GetY() + bottomLeft.GetY()
 
-		// Estimate that alignment pattern is closer by 3 modules
-		// from "bottom right" to known top left location
 		correctionToTopLeft := 1.0 - 3.0/float64(modulesBetweenFPCenters)
 		estAlignmentX := int(topLeft.GetX() + correctionToTopLeft*(bottomRightX-topLeft.GetX()))
 		estAlignmentY := int(topLeft.GetY() + correctionToTopLeft*(bottomRightY-topLeft.GetY()))
 
-		// Kind of arbitrary -- expand search radius before giving up
 		for i := 4; i <= 16; i <<= 1 {
 			alignmentPattern, e = this.findAlignmentInRegion(moduleSize,
 				estAlignmentX,
@@ -90,7 +85,6 @@ func (this *Detector) ProcessFinderPatternInfo(info *FinderPatternInfo) (*common
 				return nil, e
 			}
 		}
-		// If we didn't find alignment pattern... well try anyway without it
 	}
 
 	transform := Detector_createTransform(topLeft, topRight, bottomLeft, alignmentPattern, dimension)
@@ -121,7 +115,6 @@ func Detector_createTransform(topLeft, topRight, bottomLeft scan.ResultPoint, al
 		sourceBottomRightX = dimMinusThree - 3.0
 		sourceBottomRightY = sourceBottomRightX
 	} else {
-		// Don't have an alignment pattern, just make up the bottom-right point
 		bottomRightX = (topRight.GetX() - topLeft.GetX()) + bottomLeft.GetX()
 		bottomRightY = (topRight.GetY() - topLeft.GetY()) + bottomLeft.GetY()
 		sourceBottomRightX = dimMinusThree
@@ -157,7 +150,7 @@ func (this *Detector) computeDimension(topLeft, topRight, bottomLeft scan.Result
 	tlblCentersDimension := util.MathUtils_Round(scan.ResultPoint_Distance(topLeft, bottomLeft) / moduleSize)
 	dimension := ((tltrCentersDimension + tlblCentersDimension) / 2) + 7
 	switch dimension % 4 {
-	default: // 1? do nothing
+	default:
 		break
 	case 0:
 		dimension++
@@ -172,7 +165,6 @@ func (this *Detector) computeDimension(topLeft, topRight, bottomLeft scan.Result
 }
 
 func (this *Detector) calculateModuleSize(topLeft, topRight, bottomLeft scan.ResultPoint) float64 {
-	// Take the average
 	return (this.calculateModuleSizeOneWay(topLeft, topRight) +
 		this.calculateModuleSizeOneWay(topLeft, bottomLeft)) / 2
 }
@@ -192,8 +184,6 @@ func (this *Detector) calculateModuleSizeOneWay(pattern, otherPattern scan.Resul
 	if math.IsNaN(moduleSizeEst2) {
 		return moduleSizeEst1 / 7.0
 	}
-	// Average them, and divide by 7 since we've counted the width of 3 black modules,
-	// and 1 white and 1 black module on either side. Ergo, divide sum by 14.
 	return (moduleSizeEst1 + moduleSizeEst2) / 14.0
 }
 
@@ -201,7 +191,6 @@ func (this *Detector) sizeOfBlackWhiteBlackRunBothWays(fromX, fromY, toX, toY in
 
 	result := this.sizeOfBlackWhiteBlackRun(fromX, fromY, toX, toY)
 
-	// Now count other way -- don't run off image though of course
 	scale := float64(1.0)
 	otherToX := fromX - (toX - fromX)
 	if otherToX < 0 {
@@ -264,9 +253,6 @@ func (this *Detector) sizeOfBlackWhiteBlackRun(fromX, fromY, toX, toY int) float
 			realY = x
 		}
 
-		// Does current pixel mean we have moved white to black or vice versa?
-		// Scanning black in state 0,2 and white in state 1, so if we find the wrong
-		// color, advance to next state or end if we are in state 2 already
 		if (state == 1) == this.image.Get(realX, realY) {
 			if state == 2 {
 				return util.MathUtils_DistanceInt(x, y, fromX, fromY)
@@ -283,19 +269,13 @@ func (this *Detector) sizeOfBlackWhiteBlackRun(fromX, fromY, toX, toY int) float
 			error -= dx
 		}
 	}
-	// Found black-white-black; give the benefit of the doubt that the next pixel outside the image
-	// is "white" so this last point at (toX+xStep,toY) is the right ending. This is really a
-	// small approximation; (toX+xStep,toY+yStep) might be really correct. Ignore this.
 	if state == 2 {
 		return util.MathUtils_DistanceInt(toX+xstep, toY, fromX, fromY)
 	}
-	// else we didn't find even black-white-black; no estimate is really possible
 	return math.NaN()
 }
 
 func (this *Detector) findAlignmentInRegion(overallEstModuleSize float64, estAlignmentX, estAlignmentY int, allowanceFactor float64) (*AlignmentPattern, error) {
-	// Look for an alignment pattern (3 modules in size) around where it
-	// should be
 	allowance := int(allowanceFactor * overallEstModuleSize)
 	alignmentAreaLeftX := estAlignmentX - allowance
 	if alignmentAreaLeftX < 0 {

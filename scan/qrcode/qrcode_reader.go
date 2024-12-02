@@ -58,7 +58,6 @@ func (this *QRCodeReader) Decode(image *scan.BinaryBitmap, hints map[scan.Decode
 		points = detectorResult.GetPoints()
 	}
 
-	// If the code was mirrored: swap the bottom-left and the top-right points.
 	if metadata, ok := decoderResult.GetOther().(*decoder.QRCodeDecoderMetaData); ok {
 		metadata.ApplyMirroredCorrection(points)
 	}
@@ -86,7 +85,6 @@ func (this *QRCodeReader) Decode(image *scan.BinaryBitmap, hints map[scan.Decode
 }
 
 func (this *QRCodeReader) Reset() {
-	// do nothing
 }
 
 func (this *QRCodeReader) extractPureBits(image *scan.BitMatrix) (*scan.BitMatrix, error) {
@@ -107,18 +105,14 @@ func (this *QRCodeReader) extractPureBits(image *scan.BitMatrix) (*scan.BitMatri
 	left := leftTopBlack[0]
 	right := rightBottomBlack[0]
 
-	// Sanity check!
 	if left >= right || top >= bottom {
 		return nil, scan.NewNotFoundException(
 			"(left,right)=(%v,%v), (top,bottom)=(%v,%v)", left, right, top, bottom)
 	}
 
 	if bottom-top != right-left {
-		// Special case, where bottom-right module wasn't black so we found something else in the last row
-		// Assume it's a square, so use height as the width
 		right = left + (bottom - top)
 		if right >= image.GetWidth() {
-			// Abort if that would not make sense -- off image
 			return nil, scan.NewNotFoundException("right = %v, width = %v", right, image.GetWidth())
 		}
 	}
@@ -129,39 +123,28 @@ func (this *QRCodeReader) extractPureBits(image *scan.BitMatrix) (*scan.BitMatri
 		return nil, scan.NewNotFoundException("matrixWidth/Height = %v, %v", matrixWidth, matrixHeight)
 	}
 	if matrixHeight != matrixWidth {
-		// Only possibly decode square regions
 		return nil, scan.NewNotFoundException("matrixWidth/Height = %v, %v", matrixWidth, matrixHeight)
 	}
 
-	// Push in the "border" by half the module width so that we start
-	// sampling in the middle of the module. Just in case the image is a
-	// little off, this will help recover.
 	nudge := int(moduleSize / 2.0)
 	top += nudge
 	left += nudge
 
-	// But careful that this does not sample off the edge
-	// "right" is the farthest-right valid pixel location -- right+1 is not necessarily
-	// This is positive by how much the inner x loop below would be too large
 	nudgedTooFarRight := left + int(float64(matrixWidth-1)*moduleSize) - right
 	if nudgedTooFarRight > 0 {
 		if nudgedTooFarRight > nudge {
-			// Neither way fits; abort
 			return nil, scan.NewNotFoundException("Neither way fits")
 		}
 		left -= nudgedTooFarRight
 	}
-	// See logic above
 	nudgedTooFarDown := top + int(float64(matrixHeight-1)*moduleSize) - bottom
 	if nudgedTooFarDown > 0 {
 		if nudgedTooFarDown > nudge {
-			// Neither way fits; abort
 			return nil, scan.NewNotFoundException("Neither way fits")
 		}
 		top -= nudgedTooFarDown
 	}
 
-	// Now just read off the bits
 	bits, _ := scan.NewBitMatrix(matrixWidth, matrixHeight)
 	for y := 0; y < matrixHeight; y++ {
 		iOffset := top + int(float64(y)*moduleSize)

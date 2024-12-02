@@ -17,18 +17,14 @@ func NewRGBLuminanceSource(width, height int, pixels []int) LuminanceSource {
 	left := 0
 	top := 0
 
-	// In order to measure pure decoding speed, we convert the entire image to a greyscale array
-	// up front, which is the same as the Y channel of the YUVLuminanceSource in the real app.
 	//
-	// Total number of pixels suffices, can ignore shape
 	size := width * height
 	luminances := make([]byte, size)
 	for offset := 0; offset < size; offset++ {
 		pixel := pixels[offset]
-		r := (pixel >> 16) & 0xff  // red
-		g2 := (pixel >> 7) & 0x1fe // 2 * green
-		b := pixel & 0xff          // blue
-		// Calculate green-favouring average cheaply
+		r := (pixel >> 16) & 0xff
+		g2 := (pixel >> 7) & 0x1fe
+		b := pixel & 0xff
 		luminances[offset] = byte((r + g2 + b) / 4)
 	}
 
@@ -59,8 +55,6 @@ func (this *RGBLuminanceSource) GetMatrix() []byte {
 	width := this.GetWidth()
 	height := this.GetHeight()
 
-	// If the caller asks for the entire underlying image, save the copy and give them the
-	// original data. The docs specifically warn that result.length must be ignored.
 	if width == this.dataWidth && height == this.dataHeight {
 		return this.luminances
 	}
@@ -69,13 +63,11 @@ func (this *RGBLuminanceSource) GetMatrix() []byte {
 	matrix := make([]byte, area)
 	inputOffset := this.top*this.dataWidth + this.left
 
-	// If the width matches the full width of the underlying data, perform a single copy.
 	if width == this.dataWidth {
 		copy(matrix, this.luminances[inputOffset:inputOffset+area])
 		return matrix
 	}
 
-	// Otherwise copy one cropped row at a time.
 	for y := 0; y < height; y++ {
 		outputOffset := y * width
 		copy(matrix[outputOffset:outputOffset+width], this.luminances[inputOffset:inputOffset+width])

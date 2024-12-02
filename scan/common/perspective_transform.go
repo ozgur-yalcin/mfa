@@ -15,7 +15,7 @@ func PerspectiveTransform_QuadrilateralToQuadrilateral(x0, y0, x1, y1, x2, y2, x
 }
 
 func (p *PerspectiveTransform) TransformPoints(points []float64) {
-	maxI := len(points) - 1 // points.length must be even
+	maxI := len(points) - 1
 	for i := 0; i < maxI; i += 2 {
 		x := points[i]
 		y := points[i+1]
@@ -40,7 +40,6 @@ func PerspectiveTransform_SquareToQuadrilateral(x0, y0, x1, y1, x2, y2, x3, y3 f
 	dx3 := x0 - x1 + x2 - x3
 	dy3 := y0 - y1 + y2 - y3
 	if dx3 == 0.0 && dy3 == 0.0 {
-		// Affine
 		return &PerspectiveTransform{
 			x1 - x0, x2 - x1, x0,
 			y1 - y0, y2 - y1, y0,
@@ -61,12 +60,10 @@ func PerspectiveTransform_SquareToQuadrilateral(x0, y0, x1, y1, x2, y2, x3, y3 f
 }
 
 func PerspectiveTransform_QuadrilateralToSquare(x0, y0, x1, y1, x2, y2, x3, y3 float64) *PerspectiveTransform {
-	// Here, the adjoint serves as the inverse:
 	return PerspectiveTransform_SquareToQuadrilateral(x0, y0, x1, y1, x2, y2, x3, y3).buildAdjoint()
 }
 
 func (p *PerspectiveTransform) buildAdjoint() *PerspectiveTransform {
-	// Adjoint is the transpose of the cofactor matrix:
 	return &PerspectiveTransform{
 		p.a22*p.a33 - p.a23*p.a32,
 		p.a23*p.a31 - p.a21*p.a33,

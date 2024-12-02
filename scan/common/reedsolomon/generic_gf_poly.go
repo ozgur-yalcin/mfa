@@ -19,7 +19,6 @@ func NewGenericGFPoly(field *GenericGF, coefficients []int) (*GenericGFPoly, err
 
 	coefficientsLength := len(coefficients)
 	if coefficientsLength > 1 && coefficients[0] == 0 {
-		// Leading term must be non-zero for anything except the constant polynomial "0"
 		firstNonZero := 1
 		for firstNonZero < coefficientsLength && coefficients[firstNonZero] == 0 {
 			firstNonZero++
@@ -54,11 +53,9 @@ func (this *GenericGFPoly) GetCoefficient(degree int) int {
 
 func (this *GenericGFPoly) EvaluateAt(a int) int {
 	if a == 0 {
-		// Just return the x^0 coefficient
 		return this.GetCoefficient(0)
 	}
 	if a == 1 {
-		// Just the sum of the coefficients
 		result := 0
 		for _, coefficient := range this.coefficients {
 			result = GenericGF_addOrSubtract(result, coefficient)
@@ -91,7 +88,6 @@ func (this *GenericGFPoly) AddOrSubtract(other *GenericGFPoly) (*GenericGFPoly, 
 	}
 	sumDiff := make([]int, len(largerCoefficients))
 	lengthDiff := len(largerCoefficients) - len(smallerCoefficients)
-	// Copy high-order terms only found in higher-degree polynomial's coefficients
 	copy(sumDiff, largerCoefficients[:lengthDiff])
 	for i := lengthDiff; i < len(largerCoefficients); i++ {
 		sumDiff[i] = GenericGF_addOrSubtract(smallerCoefficients[i-lengthDiff], largerCoefficients[i])

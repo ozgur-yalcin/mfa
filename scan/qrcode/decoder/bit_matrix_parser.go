@@ -22,21 +22,17 @@ func (this *BitMatrixParser) ReadFormatInformation() (*FormatInformation, error)
 		return this.parsedFormatInfo, nil
 	}
 
-	// Read top-left format info bits
 	formatInfoBits1 := 0
 	for i := 0; i < 6; i++ {
 		formatInfoBits1 = this.copyBit(i, 8, formatInfoBits1)
 	}
-	// .. and skip a bit in the timing pattern ...
 	formatInfoBits1 = this.copyBit(7, 8, formatInfoBits1)
 	formatInfoBits1 = this.copyBit(8, 8, formatInfoBits1)
 	formatInfoBits1 = this.copyBit(8, 7, formatInfoBits1)
-	// .. and skip a bit in the timing pattern ...
 	for j := 5; j >= 0; j-- {
 		formatInfoBits1 = this.copyBit(8, j, formatInfoBits1)
 	}
 
-	// Read the top-right/bottom-left pattern too
 	dimension := this.bitMatrix.GetHeight()
 	formatInfoBits2 := 0
 	jMin := dimension - 7
@@ -66,7 +62,6 @@ func (this *BitMatrixParser) ReadVersion() (*Version, error) {
 		return Version_GetVersionForNumber(provisionalVersion)
 	}
 
-	// Read top-right version info: 3 wide by 6 tall
 	versionBits := 0
 	ijMin := dimension - 11
 	for j := 5; j >= 0; j-- {
@@ -80,7 +75,6 @@ func (this *BitMatrixParser) ReadVersion() (*Version, error) {
 		return theParsedVersion, nil
 	}
 
-	// Hmm, failed. Try bottom left: 6 wide by 3 tall
 	versionBits = 0
 	for i := 5; i >= 0; i-- {
 		for j := dimension - 9; j >= ijMin; j-- {
@@ -120,8 +114,6 @@ func (this *BitMatrixParser) ReadCodewords() ([]byte, error) {
 		return nil, scan.WrapFormatException(e)
 	}
 
-	// Get the data mask for the format used in this QR Code. This will exclude
-	// some bits from reading as we wind through the bit matrix.
 	dataMask := DataMaskValues[formatInfo.GetDataMask()]
 	dimension := this.bitMatrix.GetHeight()
 	dataMask.UnmaskBitMatrix(this.bitMatrix, dimension)
@@ -136,29 +128,22 @@ func (this *BitMatrixParser) ReadCodewords() ([]byte, error) {
 	resultOffset := 0
 	currentByte := 0
 	bitsRead := 0
-	// Read columns in pairs, from right to left
 	for j := dimension - 1; j > 0; j -= 2 {
 		if j == 6 {
-			// Skip whole column with vertical alignment pattern;
-			// saves time and makes the other code proceed more cleanly
 			j--
 		}
-		// Read alternatingly from bottom to top then top to bottom
 		for count := 0; count < dimension; count++ {
 			i := count
 			if readingUp {
 				i = dimension - 1 - count
 			}
 			for col := 0; col < 2; col++ {
-				// Ignore bits covered by the function pattern
 				if !functionPattern.Get(j-col, i) {
-					// Read a bit
 					bitsRead++
 					currentByte <<= 1
 					if this.bitMatrix.Get(j-col, i) {
 						currentByte |= 1
 					}
-					// If we've made a whole byte, save it off
 					if bitsRead == 8 {
 						result[resultOffset] = byte(currentByte)
 						resultOffset++
@@ -168,7 +153,7 @@ func (this *BitMatrixParser) ReadCodewords() ([]byte, error) {
 				}
 			}
 		}
-		readingUp = !readingUp // readingUp ^= true; // switch directions
+		readingUp = !readingUp
 	}
 	if resultOffset != version.GetTotalCodewords() {
 		return nil, scan.NewFormatException(
@@ -179,7 +164,7 @@ func (this *BitMatrixParser) ReadCodewords() ([]byte, error) {
 
 func (this *BitMatrixParser) Remask() {
 	if this.parsedFormatInfo == nil {
-		return // We have no format information, and have no data mask
+		return
 	}
 	dataMask := DataMaskValues[this.parsedFormatInfo.GetDataMask()]
 	dimension := this.bitMatrix.GetHeight()

@@ -56,7 +56,6 @@ func (this *GlobalHistogramBinarizer) GetBlackRow(y int, row *BitArray) (*BitArr
 	}
 
 	if width < 3 {
-		// Special case for very small images
 		for x := 0; x < width; x++ {
 			if int(localLuminances[x]&0xff) < blackPoint {
 				row.Set(x)
@@ -67,7 +66,6 @@ func (this *GlobalHistogramBinarizer) GetBlackRow(y int, row *BitArray) (*BitArr
 		center := int(localLuminances[1] & 0xff)
 		for x := 1; x < width-1; x++ {
 			right := int(localLuminances[x+1] & 0xff)
-			// A simple -1 4 -1 box filter with a weight of 2.
 			if ((center*4)-left-right)/2 < blackPoint {
 				row.Set(x)
 			}
@@ -87,8 +85,6 @@ func (this *GlobalHistogramBinarizer) GetBlackMatrix() (*BitMatrix, error) {
 		return nil, e
 	}
 
-	// Quickly calculates the histogram by sampling four rows from the image. This proved to be
-	// more robust on the blackbox tests than sampling a diagonal as we used to do.
 	this.initArrays(width)
 	localBuckets := this.buckets
 	for y := 1; y < 5; y++ {
@@ -105,9 +101,6 @@ func (this *GlobalHistogramBinarizer) GetBlackMatrix() (*BitMatrix, error) {
 		return nil, e
 	}
 
-	// We delay reading the entire image luminance until the black point estimation succeeds.
-	// Although we end up reading four rows twice, it is consistent with our motto of
-	// "fail quickly" which is necessary for continuous scanning.
 	localLuminances := source.GetMatrix()
 	for y := 0; y < height; y++ {
 		offset := y * width
@@ -136,7 +129,6 @@ func (this *GlobalHistogramBinarizer) initArrays(luminanceSize int) {
 }
 
 func (this *GlobalHistogramBinarizer) estimateBlackPoint(buckets []int) (int, error) {
-	// Find the tallest peak in the histogram.
 	numBuckets := len(buckets)
 	maxBucketCount := 0
 	firstPeak := 0
@@ -151,12 +143,10 @@ func (this *GlobalHistogramBinarizer) estimateBlackPoint(buckets []int) (int, er
 		}
 	}
 
-	// Find the second-tallest peak which is somewhat far from the tallest peak.
 	secondPeak := 0
 	secondPeakScore := 0
 	for x := 0; x < numBuckets; x++ {
 		distanceToBiggest := x - firstPeak
-		// Encourage more distant second peaks by multiplying by square of distance.
 		score := buckets[x] * distanceToBiggest * distanceToBiggest
 		if score > secondPeakScore {
 			secondPeak = x
@@ -164,18 +154,14 @@ func (this *GlobalHistogramBinarizer) estimateBlackPoint(buckets []int) (int, er
 		}
 	}
 
-	// Make sure firstPeak corresponds to the black peak.
 	if firstPeak > secondPeak {
 		firstPeak, secondPeak = secondPeak, firstPeak
 	}
 
-	// If there is too little contrast in the image to pick a meaningful black point, throw rather
-	// than waste time trying to decode the image, and risk false positives.
 	if secondPeak-firstPeak <= numBuckets/16 {
 		return 0, NewNotFoundException()
 	}
 
-	// Find a valley between them that is low and closer to the white peak.
 	bestValley := secondPeak - 1
 	bestValleyScore := -1
 	for x := secondPeak - 1; x > firstPeak; x-- {
