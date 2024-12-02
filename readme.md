@@ -42,10 +42,10 @@ Commands:
 ```
 Flags:
   -m, --mode string    use time-variant TOTP mode or use event-based HOTP mode (default "totp")
-  -H, --hash string    A cryptographic hash method H (SHA1, SHA256, SHA512) (default "SHA1")
-  -l, --digits int     A HOTP value digits d (default 6)
-  -i, --period int     used for TOTP, an period (Tx) which will be used to calculate the value of the counter CT (default 30)
-  -c, --counter int    used for HOTP, A counter C, which counts the number of iterations
+  -H, --hash string    hash method (SHA1, SHA256, SHA512) (default "SHA1")
+  -i, --period int     period of calculate otp for TOTP (default 30)
+  -l, --digits int     otp length for HOTP (default 6)
+  -c, --counter int    number of iterations count for HOTP
 ```
 
 ## Examples
