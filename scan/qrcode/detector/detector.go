@@ -225,13 +225,10 @@ func (this *Detector) sizeOfBlackWhiteBlackRunBothWays(fromX, fromY, toX, toY in
 
 	result += this.sizeOfBlackWhiteBlackRun(fromX, fromY, otherToX, otherToY)
 
-	// Middle pixel is double-counted this way; subtract 1
 	return result - 1.0
 }
 
 func (this *Detector) sizeOfBlackWhiteBlackRun(fromX, fromY, toX, toY int) float64 {
-	// Mild variant of Bresenham's algorithm;
-	// see http://en.wikipedia.org/wiki/Bresenham's_line_algorithm
 	steep := false
 	dx := toX - fromX
 	if dx < 0 {
@@ -257,10 +254,7 @@ func (this *Detector) sizeOfBlackWhiteBlackRun(fromX, fromY, toX, toY int) float
 	if fromY >= toY {
 		ystep = -1
 	}
-
-	// In black pixels, looking for white, first or second time.
 	state := 0
-	// Loop up until x == toX, but not beyond
 	xLimit := toX + xstep
 	for x, y := fromX, fromY; x != xLimit; x += xstep {
 		realX := x
