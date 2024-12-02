@@ -65,12 +65,11 @@ func (c *qrCommand) Run(ctx context.Context, cd *Ancestor, args []string) error 
 	if err := c.fs.Parse(args); err != nil {
 		return err
 	}
-	path := c.fs.Arg(0)
-	otpauth, err := c.readQRCode(path)
+	qr, err := c.readQRCode(c.fs.Arg(0))
 	if err != nil {
 		return err
 	}
-	u, err := url.Parse(strings.ReplaceAll(otpauth.String(), "&amp;", "&"))
+	u, err := url.Parse(strings.ReplaceAll(qr.String(), "&amp;", "&"))
 	if err != nil {
 		return err
 	}
@@ -83,7 +82,6 @@ func (c *qrCommand) Run(ctx context.Context, cd *Ancestor, args []string) error 
 	account.Digits = c.digits
 	account.Period = c.period
 	account.Counter = c.counter
-	q := u.Query()
 	if host := u.Hostname(); host != "" {
 		account.Mode = host
 	}
@@ -95,22 +93,22 @@ func (c *qrCommand) Run(ctx context.Context, cd *Ancestor, args []string) error 
 			account.Issuer = path
 		}
 	}
-	if issuer := q.Get("issuer"); issuer != "" {
+	if issuer := u.Query().Get("issuer"); issuer != "" {
 		account.Issuer = issuer
 	}
-	if secret := q.Get("secret"); secret != "" {
+	if secret := u.Query().Get("secret"); secret != "" {
 		account.Secret = secret
 	}
-	if hash := q.Get("algorithm"); hash != "" {
+	if hash := u.Query().Get("algorithm"); hash != "" {
 		account.Hash = hash
 	}
-	if digits := q.Get("digits"); digits != "" {
+	if digits := u.Query().Get("digits"); digits != "" {
 		fmt.Sscanf(digits, "%d", &account.Digits)
 	}
-	if period := q.Get("period"); period != "" && account.Mode == "totp" {
+	if period := u.Query().Get("period"); period != "" && account.Mode == "totp" {
 		fmt.Sscanf(period, "%d", &account.Period)
 	}
-	if counter := q.Get("counter"); counter != "" && account.Mode == "hotp" {
+	if counter := u.Query().Get("counter"); counter != "" && account.Mode == "hotp" {
 		fmt.Sscanf(counter, "%d", &account.Counter)
 	}
 	if err := c.saveAccount(account.Issuer, account.User, account.Secret, account.Mode, account.Hash, account.Digits, account.Period, account.Counter); err != nil {
