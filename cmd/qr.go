@@ -20,8 +20,8 @@ import (
 	_ "golang.org/x/image/tiff"
 	_ "golang.org/x/image/webp"
 
-	"github.com/ozgur-yalcin/mfa/scan"
-	"github.com/ozgur-yalcin/mfa/scan/qrcode"
+	"github.com/ozgur-yalcin/mfa/lib"
+	"github.com/ozgur-yalcin/mfa/lib/qrcode"
 	"github.com/ozgur-yalcin/mfa/src/database"
 	"github.com/ozgur-yalcin/mfa/src/initialize"
 	"github.com/ozgur-yalcin/mfa/src/models"
@@ -125,7 +125,7 @@ func (c *qrCommand) Run(ctx context.Context, cd *Ancestor, args []string) error 
 	return nil
 }
 
-func (c *qrCommand) readQRCode(path string) (*scan.Result, error) {
+func (c *qrCommand) readQRCode(path string) (*lib.Result, error) {
 	file, err := os.Open(path)
 	if err != nil {
 		return nil, err
@@ -135,9 +135,9 @@ func (c *qrCommand) readQRCode(path string) (*scan.Result, error) {
 	if err != nil {
 		return nil, err
 	}
-	source := scan.NewLuminanceSourceFromImage(img)
-	binary := scan.NewHybridBinarizer(source)
-	bitmap, err := scan.NewBinaryBitmap(binary)
+	source := lib.NewLuminanceSourceFromImage(img)
+	binary := lib.NewHybridBinarizer(source)
+	bitmap, err := lib.NewBinaryBitmap(binary)
 	if err != nil {
 		return nil, err
 	}
