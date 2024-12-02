@@ -12,7 +12,7 @@ mfa *("multi-factor authentication")* is a command line tool for generating and 
 ## Usage
 
 ```
-mfa [command] [flags] [args]
+mfa [command] [flags] <args>
 ```
 
 ```
