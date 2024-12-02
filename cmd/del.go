@@ -30,9 +30,8 @@ func (c *delCommand) Commands() []Commander {
 	return c.commands
 }
 
-func (c *delCommand) Init(cd *Ancestor) (err error) {
+func (c *delCommand) Init(cd *Ancestor) {
 	c.fs = flag.NewFlagSet(c.name, flag.ExitOnError)
-	return
 }
 
 func (c *delCommand) Run(ctx context.Context, cd *Ancestor, args []string) (err error) {

@@ -27,9 +27,8 @@ func (c *versionCommand) Commands() []Commander {
 	return c.commands
 }
 
-func (c *versionCommand) Init(cd *Ancestor) (err error) {
+func (c *versionCommand) Init(cd *Ancestor) {
 	c.fs = flag.NewFlagSet(c.name, flag.ExitOnError)
-	return
 }
 
 func (c *versionCommand) Run(ctx context.Context, cd *Ancestor, args []string) (err error) {

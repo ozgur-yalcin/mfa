@@ -20,9 +20,8 @@ func (r *rootCommand) Name() string {
 	return r.name
 }
 
-func (r *rootCommand) Init(cd *Ancestor) (err error) {
+func (r *rootCommand) Init(cd *Ancestor) {
 	r.fs = flag.NewFlagSet(r.name, flag.ExitOnError)
-	return
 }
 
 func (r *rootCommand) Run(ctx context.Context, cd *Ancestor, args []string) (err error) {

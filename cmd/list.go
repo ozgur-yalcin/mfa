@@ -36,9 +36,8 @@ func (c *listCommand) Commands() []Commander {
 	return c.commands
 }
 
-func (c *listCommand) Init(cd *Ancestor) (err error) {
+func (c *listCommand) Init(cd *Ancestor) {
 	c.fs = flag.NewFlagSet(c.name, flag.ExitOnError)
-	return
 }
 
 func (c *listCommand) Run(ctx context.Context, cd *Ancestor, args []string) (err error) {

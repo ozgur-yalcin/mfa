@@ -6,10 +6,10 @@ import (
 )
 
 type Commander interface {
-	Name() string
-	Init(*Ancestor) error
+	Init(*Ancestor)
 	Run(ctx context.Context, cd *Ancestor, args []string) error
 	Commands() []Commander
+	Name() string
 }
 
 type Ancestor struct {
@@ -53,9 +53,7 @@ func (c *Ancestor) init() (err error) {
 
 func (c *Ancestor) run() (err error) {
 	c.Command = flag.NewFlagSet(c.Commander.Name(), flag.ContinueOnError)
-	if err := c.Commander.Init(c); err != nil {
-		return err
-	}
+	c.Commander.Init(c)
 	for _, cc := range c.ancestors {
 		if err := cc.run(); err != nil {
 			return err
