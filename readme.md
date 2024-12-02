@@ -30,11 +30,11 @@ mfa [command] [flags] [args]
 
 ```
 Available Commands:
-  add         Add account and its secret key
   generate    Generate one-time password from secret key
-  list        List all added accounts and password code
+  add         Add account and its secret key
   remove      Remove account and its secret key
   update      Add account and its secret key
+  list        List all added accounts and password code
   version     show version
 ```
 
