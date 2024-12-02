@@ -107,17 +107,26 @@ func (c *addCommand) saveAccount(accountName string, userName string, secretKey 
 		log.Fatal(err)
 	}
 	defer db.Close()
-	account := &models.Account{
-		AccountName: accountName,
-		Username:    userName,
-		SecretKey:   secretKey,
-		Mode:        c.mode,
-		Base32:      c.base32,
-		Hash:        c.hash,
-		ValueLength: c.valueLength,
-		Counter:     c.counter,
-		Epoch:       c.epoch,
-		Interval:    c.interval,
+	accounts, err := db.ListAccounts(accountName, userName)
+	if err != nil {
+		log.Fatal(err)
 	}
-	return db.CreateAccount(account)
+	if len(accounts) > 0 {
+		log.Fatal("account already exists")
+	} else if len(accounts) == 0 {
+		account := &models.Account{
+			AccountName: accountName,
+			Username:    userName,
+			SecretKey:   secretKey,
+			Mode:        c.mode,
+			Base32:      c.base32,
+			Hash:        c.hash,
+			ValueLength: c.valueLength,
+			Counter:     c.counter,
+			Epoch:       c.epoch,
+			Interval:    c.interval,
+		}
+		return db.CreateAccount(account)
+	}
+	return nil
 }
