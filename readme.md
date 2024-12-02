@@ -17,21 +17,23 @@ mfa [command] [flags] [args]
 
 ```
 Available Commands:
-  gen         Generate one-time password from secret key
-  add         Create account and its secret key
-  set         Update account and its secret key
-  del         Delete accounts and its secret key
-  list        List all accounts and password code
+  gen         Generate otp by secret key
+  qr          Create account by qr code
+  add         Create account by secret key
+  set         Update account by secret key
+  del         Delete accounts by secret key
+  list        List accounts
   version     show version
 ```
 
 ```
-mfa qr [flags]
-mfa gen [flags] <secret key>
-mfa add [flags] <account name> <secret key>
-mfa set [flags] <account name> <secret key>
-mfa del <account name> [user name]
-mfa list [account name]
+mfa qr [flags] <image-path>
+mfa gen [flags] <secret-key>
+mfa add [flags] <issuer> <secret-key>
+mfa set [flags] <issuer> <secret-key>
+mfa del <issuer>
+mfa list <issuer>
+mfa version
 ```
 
 Commonly used flags
@@ -49,13 +51,13 @@ Flags:
 
 ### Generate code
 
-Generate a **time-based** one-time password but do not save the secret key
+Generate a **time-based** otp but do not save the secret key
 
 ```
 mfa gen ADOO3MCCCVO5AVD6
 ```
 
-Generate a **counter-based** one-time password with counter 1
+Generate a **counter-based** otp with counter 1
 
 ```
 mfa gen -m hotp -c 1 ADOO3MCCCVO5AVD6
@@ -63,13 +65,13 @@ mfa gen -m hotp -c 1 ADOO3MCCCVO5AVD6
 
 ### Create account
 
-Create an account named GitHub
+Create an issuerd GitHub
 
 ```
 mfa add GitHub ADOO3MCCCVO5AVD6
 ```
 
-Create an account, the account name is GitHub, the user name is ozgur-yalcin
+Create an account, the issuer is GitHub, the user is ozgur-yalcin
 
 ```
 mfa add GitHub:ozgur-yalcin ADOO3MCCCVO5AVD6
@@ -89,13 +91,13 @@ List all accounts named GitHub
 mfa list GitHub
 ```
 
-List accounts whose account name is GitHub and whose user is ozgur-yalcin
+List accounts whose issuer is GitHub and whose user is ozgur-yalcin
 
 ```
 mfa list GitHub:ozgur-yalcin
 ```
 
-List accounts whose account name is GitHub and whose user is ozgur-yalcin
+List accounts whose issuer is GitHub and whose user is ozgur-yalcin
 
 ```
 mfa list GitHub ozgur-yalcin
@@ -109,7 +111,7 @@ Delete all accounts named GitHub
 mfa del GitHub
 ```
 
-Delete accounts  whose account name is GitHub and whose user is ozgur-yalcin
+Delete accounts  whose issuer is GitHub and whose user is ozgur-yalcin
 
 ```
 mfa del GitHub ozgur-yalcin
@@ -117,13 +119,13 @@ mfa del GitHub ozgur-yalcin
 
 ### Update account
 
-Update the secret key of accounts which account name is GitHub
+Update the secret key of accounts which issuer is GitHub
 
 ```
 mfa set GitHub 5BRSSSBJUWBQBOXE
 ```
 
-Update the secret key of accounts which account name is GitHub and the user is ozgur-yalcin
+Update the secret key of accounts which issuer is GitHub and the user is ozgur-yalcin
 
 ```
 mfa set GitHub:ozgur-yalcin 5BRSSSBJUWBQBOXE
