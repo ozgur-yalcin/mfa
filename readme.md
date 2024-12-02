@@ -28,9 +28,8 @@ mfa list <issuer>
 mfa version
 ```
 
-Commands
-
 ```
+Commands:
   gen         Generate otp by secret key
   qr          Create account by qr code
   add         Create account by secret key
@@ -39,8 +38,6 @@ Commands
   list        List accounts
   version     show version
 ```
-
-Flags
 
 ```
 Flags:
