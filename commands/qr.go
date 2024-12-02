@@ -143,11 +143,7 @@ func (c *qrCommand) readQRCode(path string) (*gozxing.Result, error) {
 		return nil, err
 	}
 	reader := qrcode.NewQRCodeReader()
-	result, err := reader.Decode(bitmap, nil)
-	if err != nil {
-		return nil, err
-	}
-	return result, nil
+	return reader.Decode(bitmap, nil)
 }
 
 func (c *qrCommand) saveAccount(account *models.Account) error {
