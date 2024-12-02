@@ -19,16 +19,6 @@ go build -v
 ## Usage
 
 ```
-  gen         Generate otp by secret key
-  qr          Create account by qr code
-  add         Create account by secret key
-  set         Update account by secret key
-  del         Delete accounts by secret key
-  list        List accounts
-  version     show version
-```
-
-```
 mfa qr [flags] <image-path>
 mfa gen [flags] <secret-key>
 mfa add [flags] <issuer> <secret-key>
@@ -38,7 +28,19 @@ mfa list <issuer>
 mfa version
 ```
 
-Commonly used flags
+Commands
+
+```
+  gen         Generate otp by secret key
+  qr          Create account by qr code
+  add         Create account by secret key
+  set         Update account by secret key
+  del         Delete accounts by secret key
+  list        List accounts
+  version     show version
+```
+
+Flags
 
 ```
 Flags:
