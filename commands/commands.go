@@ -28,12 +28,13 @@ func newExec() (*Exec, error) {
 	rootCmd := &rootCommand{
 		name: "mfa",
 		commands: []Commander{
-			newVersionCommand(),
 			newGenerateCommand(),
+			newQrCommand(),
 			newAddCommand(),
 			newRemoveCommand(),
 			newUpdateCommand(),
 			newListCommand(),
+			newVersionCommand(),
 		},
 	}
 	return New(rootCmd)

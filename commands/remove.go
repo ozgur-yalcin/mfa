@@ -39,24 +39,24 @@ func (c *removeCommand) Run(ctx context.Context, cd *Ancestor, args []string) er
 	if err := c.fs.Parse(args); err != nil {
 		log.Fatal(err)
 	}
-	var accountName, userName string
+	var issuer, user string
 	if pairs := strings.SplitN(c.fs.Arg(0), ":", 2); len(pairs) == 2 {
-		accountName = pairs[0]
-		userName = pairs[1]
+		issuer = pairs[0]
+		user = pairs[1]
 	} else {
-		accountName = c.fs.Arg(0)
+		issuer = c.fs.Arg(0)
 	}
-	if accountName == "" {
+	if issuer == "" {
 		log.Fatal("account name cannot be empty")
 	}
-	if err := c.removeAccount(accountName, userName); err != nil {
+	if err := c.removeAccount(issuer, user); err != nil {
 		log.Fatal(err)
 	}
 	log.Println("accounts deleted successfully")
 	return nil
 }
 
-func (c *removeCommand) removeAccount(accountName string, userName string) error {
+func (c *removeCommand) removeAccount(issuer string, user string) error {
 	db, err := database.LoadDatabase()
 	if err != nil {
 		log.Fatal(err)
@@ -65,14 +65,14 @@ func (c *removeCommand) removeAccount(accountName string, userName string) error
 		log.Fatal(err)
 	}
 	defer db.Close()
-	accounts, err := db.ListAccounts(accountName, userName)
+	accounts, err := db.ListAccounts(issuer, user)
 	if err != nil {
 		log.Fatal(err)
 	}
 	if len(accounts) == 0 {
 		log.Fatal("account not found")
 	} else if len(accounts) > 0 {
-		return db.RemoveAccount(accountName, userName)
+		return db.RemoveAccount(issuer, user)
 	}
 	return nil
 }

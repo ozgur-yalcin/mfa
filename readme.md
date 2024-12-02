@@ -50,13 +50,11 @@ Commonly used flags
 
 ```
 Flags:
-  -b, --base32         use base32 encoding of KEY instead of hex (default true)
-  -c, --counter int    used for HOTP, A counter C, which counts the number of iterations
-  -e, --epoch int      used for TOTP, epoch (T0) which is the Unix time from which to start counting time steps
-  -H, --hash string    A cryptographic hash method H (SHA1, SHA256, SHA512) (default "SHA1")
-  -i, --interval int   used for TOTP, an interval (Tx) which will be used to calculate the value of the counter CT (default 30)
-  -l, --length int     A HOTP value length d (default 6)
   -m, --mode string    use time-variant TOTP mode or use event-based HOTP mode (default "totp")
+  -H, --hash string    A cryptographic hash method H (SHA1, SHA256, SHA512) (default "SHA1")
+  -l, --digits int     A HOTP value digits d (default 6)
+  -i, --period int     used for TOTP, an period (Tx) which will be used to calculate the value of the counter CT (default 30)
+  -c, --counter int    used for HOTP, A counter C, which counts the number of iterations
 ```
 
 ## Examples
@@ -103,13 +101,13 @@ List all accounts named GitHub
 mfa list GitHub
 ```
 
-List accounts whose account name is GitHub and whose username is ozgur-yalcin
+List accounts whose account name is GitHub and whose user is ozgur-yalcin
 
 ```
 mfa list GitHub:ozgur-yalcin
 ```
 
-List accounts whose account name is GitHub and whose username is ozgur-yalcin
+List accounts whose account name is GitHub and whose user is ozgur-yalcin
 
 ```
 mfa list GitHub ozgur-yalcin
@@ -123,7 +121,7 @@ Remove all accounts named GitHub
 mfa remove GitHub
 ```
 
-Delete accounts  whose account name is GitHub and whose username is ozgur-yalcin
+Delete accounts  whose account name is GitHub and whose user is ozgur-yalcin
 
 ```
 mfa remove GitHub ozgur-yalcin
@@ -137,7 +135,7 @@ Update the secret key of accounts which account name is GitHub
 mfa update GitHub 5BRSSSBJUWBQBOXE
 ```
 
-Update the secret key of accounts which account name is GitHub and the username is ozgur-yalcin
+Update the secret key of accounts which account name is GitHub and the user is ozgur-yalcin
 
 ```
 mfa update GitHub:ozgur-yalcin 5BRSSSBJUWBQBOXE

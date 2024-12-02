@@ -6,32 +6,28 @@ import (
 )
 
 type TOTP struct {
-	base32      bool
-	hashMethod  string
-	valueLength int
-	epoch       int64
-	interval    int64
+	hash   string
+	digits int
+	period int64
 }
 
-func NewTOTP(base32 bool, hash string, length int, epoch int64, interval int64) *TOTP {
+func NewTOTP(hash string, digits int, period int64) *TOTP {
 	return &TOTP{
-		base32:      base32,
-		hashMethod:  hash,
-		valueLength: length,
-		epoch:       epoch,
-		interval:    interval,
+		hash:   hash,
+		digits: digits,
+		period: period,
 	}
 }
 
 func (t *TOTP) counter() int64 {
 	currentTime := time.Now().UTC().Unix()
-	delta := currentTime - t.epoch
-	return delta / t.interval
+	delta := currentTime
+	return delta / t.period
 }
 
-func (t *TOTP) GeneratePassCode(secretKey string) (string, error) {
-	hotp := NewHOTP(t.base32, t.hashMethod, t.counter(), t.valueLength)
-	return hotp.GeneratePassCode(secretKey)
+func (t *TOTP) GeneratePassCode(key string) (string, error) {
+	hotp := NewHOTP(t.hash, t.digits, t.counter())
+	return hotp.GeneratePassCode(key)
 }
 
 func counterToBytes(counter int64) []byte {

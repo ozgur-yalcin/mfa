@@ -7,7 +7,6 @@ import (
 	"crypto/sha512"
 	"encoding/base32"
 	"encoding/binary"
-	"encoding/hex"
 	"errors"
 	"fmt"
 	"math"
@@ -15,39 +14,28 @@ import (
 )
 
 type HOTP struct {
-	base32      bool
-	hashMethod  string
-	counter     int64
-	valueLength int
+	hash    string
+	digits  int
+	counter int64
 }
 
-func NewHOTP(base32 bool, hash string, counter int64, length int) *HOTP {
+func NewHOTP(hash string, digits int, counter int64) *HOTP {
 	return &HOTP{
-		base32:      base32,
-		hashMethod:  hash,
-		counter:     counter,
-		valueLength: length,
+		hash:    hash,
+		digits:  digits,
+		counter: counter,
 	}
 }
 
-func (t *HOTP) GeneratePassCode(secretKey string) (code string, err error) {
-	var secret []byte
-	if t.base32 {
-		secretKey = strings.Join(strings.Fields(secretKey), "")
-		secretKey = strings.ToUpper(secretKey)
-		secret, err = base32.StdEncoding.DecodeString(secretKey)
-		if err != nil {
-			return "", errors.New("base32 decoding failed: Base32-encoded secret key is invalid")
-		}
-	} else {
-		secretKey = strings.Join(strings.Fields(secretKey), "")
-		secret, err = hex.DecodeString(secretKey)
-		if err != nil {
-			return "", errors.New("hex decoding failed: hex-encoded secret key is invalid")
-		}
+func (t *HOTP) GeneratePassCode(key string) (code string, err error) {
+	key = strings.Join(strings.Fields(key), "")
+	key = strings.ToUpper(key)
+	secret, err := base32.StdEncoding.DecodeString(key)
+	if err != nil {
+		return "", errors.New("base32 decoding failed: secret key is invalid")
 	}
 	var sum []byte
-	switch t.hashMethod {
+	switch t.hash {
 	case "SHA1":
 		mac := hmac.New(sha1.New, secret)
 		mac.Write(counterToBytes(t.counter))
@@ -66,7 +54,7 @@ func (t *HOTP) GeneratePassCode(secretKey string) (code string, err error) {
 	offset := sum[len(sum)-1] & 0xf
 	binaryCode := binary.BigEndian.Uint32(sum[offset:])
 	verificationCode := int64(binaryCode) & 0x7FFFFFFF
-	truncatedCode := verificationCode % int64(math.Pow10(t.valueLength))
-	code = fmt.Sprintf(fmt.Sprintf("%%0%dd", t.valueLength), truncatedCode)
+	truncatedCode := verificationCode % int64(math.Pow10(t.digits))
+	code = fmt.Sprintf(fmt.Sprintf("%%0%dd", t.digits), truncatedCode)
 	return code, err
 }
