@@ -41,7 +41,7 @@ Commands:
 
 ```
 Flags:
-  -m, --mode string    use time-variant TOTP mode or use event-based HOTP mode (default "totp")
+  -m, --mode string    time-variant TOTP or event-based HOTP (default "totp")
   -H, --hash string    hash method (SHA1, SHA256, SHA512) (default "SHA1")
   -i, --period int     period of calculate otp for TOTP (default 30)
   -l, --digits int     otp length for HOTP (default 6)
