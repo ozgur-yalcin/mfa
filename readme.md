@@ -12,10 +12,6 @@ mfa *("multi-factor authentication")* is a command line tool for generating and 
 ## Usage
 
 ```
-mfa [command] [flags] <args>
-```
-
-```
 Available Commands:
   gen         Generate otp by secret key
   qr          Create account by qr code
