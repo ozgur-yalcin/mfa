@@ -20,11 +20,11 @@ import (
 	_ "golang.org/x/image/tiff"
 	_ "golang.org/x/image/webp"
 
-	"github.com/makiuchi-d/gozxing"
-	"github.com/makiuchi-d/gozxing/qrcode"
 	"github.com/ozgur-yalcin/mfa/internal/database"
 	"github.com/ozgur-yalcin/mfa/internal/initialize"
 	"github.com/ozgur-yalcin/mfa/internal/models"
+	"github.com/ozgur-yalcin/mfa/scan"
+	"github.com/ozgur-yalcin/mfa/scan/qrcode"
 )
 
 type qrCommand struct {
@@ -126,7 +126,7 @@ func (c *qrCommand) Run(ctx context.Context, cd *Ancestor, args []string) error 
 	return nil
 }
 
-func (c *qrCommand) readQRCode(path string) (*gozxing.Result, error) {
+func (c *qrCommand) readQRCode(path string) (*scan.Result, error) {
 	file, err := os.Open(path)
 	if err != nil {
 		return nil, err
@@ -136,9 +136,9 @@ func (c *qrCommand) readQRCode(path string) (*gozxing.Result, error) {
 	if err != nil {
 		return nil, err
 	}
-	source := gozxing.NewLuminanceSourceFromImage(img)
-	binary := gozxing.NewHybridBinarizer(source)
-	bitmap, err := gozxing.NewBinaryBitmap(binary)
+	source := scan.NewLuminanceSourceFromImage(img)
+	binary := scan.NewHybridBinarizer(source)
+	bitmap, err := scan.NewBinaryBitmap(binary)
 	if err != nil {
 		return nil, err
 	}
