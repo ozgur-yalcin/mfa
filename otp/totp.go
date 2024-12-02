@@ -20,14 +20,11 @@ func NewTOTP(hash string, digits int, period int64) *TOTP {
 }
 
 func (t *TOTP) counter() int64 {
-	currentTime := time.Now().UTC().Unix()
-	delta := currentTime
-	return delta / t.period
+	return time.Now().UTC().Unix() / t.period
 }
 
 func (t *TOTP) GeneratePassCode(key string) (string, error) {
-	hotp := NewHOTP(t.hash, t.digits, t.counter())
-	return hotp.GeneratePassCode(key)
+	return NewHOTP(t.hash, t.digits, t.counter()).GeneratePassCode(key)
 }
 
 func counterToBytes(counter int64) []byte {
