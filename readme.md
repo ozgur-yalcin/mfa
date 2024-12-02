@@ -61,7 +61,7 @@ Create an account by qr code
 mfa qr image.png
 ```
 
-Create an account GitHub
+Create an account named GitHub
 
 ```
 mfa add GitHub ADOO3MCCCVO5AVD6
