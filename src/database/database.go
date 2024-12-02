@@ -31,7 +31,7 @@ func (db *Database) Open() error {
 		log.Fatalf("not supported database engine: %s", db.backend.Engine())
 	}
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	db.db = conn
 	return nil

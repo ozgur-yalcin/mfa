@@ -119,7 +119,7 @@ func (c *qrCommand) Run(ctx context.Context, cd *Ancestor, args []string) error 
 		fmt.Sscanf(counter, "%d", &account.Counter)
 	}
 	if err := c.addAccount(account); err != nil {
-		log.Fatal(err)
+		return err
 	}
 	log.Println("account added successfully")
 	return nil
@@ -148,18 +148,18 @@ func (c *qrCommand) readQRCode(path string) (*lib.Result, error) {
 func (c *qrCommand) addAccount(account *models.Account) error {
 	db, err := database.LoadDatabase()
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	if err := db.Open(); err != nil {
-		log.Fatal(err)
+		return err
 	}
 	defer db.Close()
 	accounts, err := db.ListAccounts(account.Issuer, account.User)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	if len(accounts) > 0 {
-		log.Fatal("account already exists")
+		return errors.New("account already exists")
 	} else if len(accounts) == 0 {
 		return db.AddAccount(account)
 	}

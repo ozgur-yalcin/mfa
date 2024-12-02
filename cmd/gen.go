@@ -55,7 +55,7 @@ func (c *genCommand) Run(ctx context.Context, cd *Ancestor, args []string) (err 
 	secret := c.fs.Arg(0)
 	code, err := c.generateCode(secret)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	log.Println("Code:", code)
 	return
@@ -72,7 +72,7 @@ func (c *genCommand) generateCode(secret string) (code string, err error) {
 		return code, errors.New("mode should be hotp or totp")
 	}
 	if err != nil {
-		log.Fatal(err)
+		return code, err
 	}
 	return
 }

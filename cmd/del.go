@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"errors"
 	"flag"
 	"log"
 	"strings"
@@ -37,7 +38,7 @@ func (c *delCommand) Init(cd *Ancestor) error {
 func (c *delCommand) Run(ctx context.Context, cd *Ancestor, args []string) error {
 	initialize.Init()
 	if err := c.fs.Parse(args); err != nil {
-		log.Fatal(err)
+		return err
 	}
 	var issuer, user string
 	if pairs := strings.SplitN(c.fs.Arg(0), ":", 2); len(pairs) == 2 {
@@ -47,10 +48,10 @@ func (c *delCommand) Run(ctx context.Context, cd *Ancestor, args []string) error
 		issuer = c.fs.Arg(0)
 	}
 	if issuer == "" {
-		log.Fatal("account name cannot be empty")
+		return errors.New("issuer cannot be empty")
 	}
 	if err := c.delAccount(issuer, user); err != nil {
-		log.Fatal(err)
+		return err
 	}
 	log.Println("accounts deleted successfully")
 	return nil
@@ -59,18 +60,18 @@ func (c *delCommand) Run(ctx context.Context, cd *Ancestor, args []string) error
 func (c *delCommand) delAccount(issuer string, user string) error {
 	db, err := database.LoadDatabase()
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	if err := db.Open(); err != nil {
-		log.Fatal(err)
+		return err
 	}
 	defer db.Close()
 	accounts, err := db.ListAccounts(issuer, user)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	if len(accounts) == 0 {
-		log.Fatal("account not found")
+		return errors.New("account not found")
 	} else if len(accounts) > 0 {
 		return db.DelAccount(issuer, user)
 	}

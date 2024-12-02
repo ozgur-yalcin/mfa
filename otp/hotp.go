@@ -30,7 +30,7 @@ func NewHOTP(hash string, digits int, counter int64) *HOTP {
 func (t *HOTP) GeneratePassCode(key string) (code string, err error) {
 	secret, err := base32.StdEncoding.DecodeString(strings.ToUpper(strings.Join(strings.Fields(key), "")))
 	if err != nil {
-		return "", err
+		return code, err
 	}
 	sum := []byte{}
 	switch t.hash {
@@ -47,7 +47,7 @@ func (t *HOTP) GeneratePassCode(key string) (code string, err error) {
 		mac.Write(counterToBytes(t.counter))
 		sum = mac.Sum(nil)
 	default:
-		return "", errors.New("invalid hash algorithm")
+		return code, errors.New("invalid hash algorithm")
 	}
 	offset := sum[len(sum)-1] & 0xf
 	binaryCode := binary.BigEndian.Uint32(sum[offset:])

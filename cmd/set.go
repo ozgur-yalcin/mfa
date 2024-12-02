@@ -54,7 +54,7 @@ func (c *setCommand) Init(cd *Ancestor) error {
 func (c *setCommand) Run(ctx context.Context, cd *Ancestor, args []string) error {
 	initialize.Init()
 	if err := c.fs.Parse(args); err != nil {
-		log.Fatal(err)
+		return err
 	}
 	var issuer, user, secret string
 	if pairs := strings.SplitN(c.fs.Arg(0), ":", 2); len(pairs) == 2 {
@@ -65,13 +65,19 @@ func (c *setCommand) Run(ctx context.Context, cd *Ancestor, args []string) error
 		issuer = c.fs.Arg(0)
 		secret = c.fs.Arg(1)
 	}
+	if issuer == "" {
+		return errors.New("issuer cannot be empty")
+	}
+	if secret == "" {
+		return errors.New("secret cannot be empty")
+	}
 	if _, err := c.generateCode(secret); err != nil {
-		log.Fatal(err)
+		return err
 	}
 	if err := c.setAccount(issuer, user, secret); err != nil {
-		log.Fatal(err)
+		return err
 	}
-	log.Println("account setd successfully")
+	log.Println("account updated successfully")
 	return nil
 }
 
@@ -86,7 +92,7 @@ func (c *setCommand) generateCode(secret string) (code string, err error) {
 		return code, errors.New("mode should be hotp or totp")
 	}
 	if err != nil {
-		log.Fatal(err)
+		return code, err
 	}
 	return
 }
@@ -94,20 +100,20 @@ func (c *setCommand) generateCode(secret string) (code string, err error) {
 func (c *setCommand) setAccount(issuer string, user string, secret string) error {
 	db, err := database.LoadDatabase()
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	if err := db.Open(); err != nil {
-		log.Fatal(err)
+		return err
 	}
 	defer db.Close()
 	accounts, err := db.ListAccounts(issuer, user)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	if len(accounts) == 0 {
-		log.Fatal("account not found")
+		return errors.New("account not found")
 	} else if len(accounts) > 1 {
-		log.Fatal("multiple accounts found")
+		return errors.New("multiple accounts found")
 	} else if len(accounts) == 1 {
 		account := db.GetAccount(issuer, user)
 		account.Issuer = issuer

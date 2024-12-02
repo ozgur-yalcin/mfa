@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"errors"
 	"flag"
 	"fmt"
 	"log"
@@ -43,22 +44,20 @@ func (c *listCommand) Init(cd *Ancestor) error {
 func (c *listCommand) Run(ctx context.Context, cd *Ancestor, args []string) error {
 	initialize.Init()
 	if err := c.fs.Parse(args); err != nil {
-		log.Fatal(err)
+		return err
 	}
 	var issuer, user string
-	if c.fs.NArg() == 1 {
-		if pairs := strings.SplitN(c.fs.Arg(0), ":", 2); len(pairs) == 2 {
-			issuer = pairs[0]
-			user = pairs[1]
-		} else {
-			issuer = c.fs.Arg(0)
-		}
-	} else if c.fs.NArg() == 2 {
+	if pairs := strings.SplitN(c.fs.Arg(0), ":", 2); len(pairs) == 2 {
+		issuer = pairs[0]
+		user = pairs[1]
+	} else {
 		issuer = c.fs.Arg(0)
-		user = c.fs.Arg(1)
+	}
+	if issuer == "" {
+		return errors.New("issuer cannot be empty")
 	}
 	if err := c.listAccounts(issuer, user); err != nil {
-		log.Fatal(err)
+		return err
 	}
 	return nil
 }
@@ -66,15 +65,15 @@ func (c *listCommand) Run(ctx context.Context, cd *Ancestor, args []string) erro
 func (c *listCommand) listAccounts(issuer string, user string) error {
 	db, err := database.LoadDatabase()
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	if err := db.Open(); err != nil {
-		log.Fatal(err)
+		return err
 	}
 	defer db.Close()
 	accounts, err := db.ListAccounts(issuer, user)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	type otp struct {
 		issuer string
