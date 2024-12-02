@@ -11,29 +11,29 @@ import (
 )
 
 type Database struct {
-	db      *gorm.DB
+	client  *gorm.DB
 	backend backend.Backend
 }
 
 func (db *Database) Open() (err error) {
-	var conn *gorm.DB
+	var client *gorm.DB
 	switch db.backend.Engine() {
 	case "sqlite":
-		conn, err = gorm.Open(sqlite.Open(db.backend.Params()), &gorm.Config{})
+		client, err = gorm.Open(sqlite.Open(db.backend.Params()), &gorm.Config{})
 	case "postgresql":
-		conn, err = gorm.Open(postgres.Open(db.backend.Params()), &gorm.Config{})
+		client, err = gorm.Open(postgres.Open(db.backend.Params()), &gorm.Config{})
 	default:
 		return errors.New("not supported database engine")
 	}
 	if err != nil {
 		return err
 	}
-	db.db = conn
+	db.client = client
 	return
 }
 
 func (db *Database) Close() (err error) {
-	client, err := db.db.DB()
+	client, err := db.client.DB()
 	if err != nil {
 		return err
 	}
@@ -49,5 +49,5 @@ func (db *Database) Engine() string {
 }
 
 func (db *Database) AutoMigrate(dst ...any) (err error) {
-	return db.db.AutoMigrate(dst...)
+	return db.client.AutoMigrate(dst...)
 }
