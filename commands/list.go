@@ -16,17 +16,17 @@ import (
 	"github.com/ozgur-yalcin/mfa/internal/models"
 )
 
-type otpData struct {
-	accountName string
-	userName    string
-	code        string
-}
-
 type listCommand struct {
 	r        *rootCommand
 	fs       *flag.FlagSet
 	commands []Commander
 	name     string
+}
+
+type otpData struct {
+	accountName string
+	userName    string
+	code        string
 }
 
 func newListCommand() *listCommand {
