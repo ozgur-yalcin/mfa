@@ -31,7 +31,6 @@ mfa [command] [flags] [args]
 ```
 Available Commands:
   add         Add account and its secret key
-  completion  Generate the autocompletion script for the specified shell
   generate    Generate one-time password from secret key
   list        List all added accounts and password code
   remove      Remove account and its secret key
