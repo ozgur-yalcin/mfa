@@ -29,17 +29,6 @@ mfa version
 ```
 
 ```
-Commands:
-  gen         Generate otp
-  qr          Create account
-  add         Create account
-  set         Update account
-  del         Delete accounts
-  list        List accounts
-  version     show version
-```
-
-```
 Flags:
   -m, --mode string    time-variant TOTP or event-based HOTP (default "totp")
   -H, --hash string    hash method (SHA1, SHA256, SHA512) (default "SHA1")
