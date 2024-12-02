@@ -30,11 +30,11 @@ mfa version
 
 ```
 Flags:
-  -m, --mode string    time-variant TOTP or event-based HOTP (default "totp")
-  -H, --hash string    hash method (SHA1, SHA256, SHA512) (default "SHA1")
-  -i, --period int     period of calculate otp for TOTP (default 30)
-  -l, --digits int     otp length for HOTP (default 6)
-  -c, --counter int    number of iterations count for HOTP
+ -m, --mode string  time-variant TOTP or event-based HOTP (default "totp")
+ -H, --hash string  hash method (SHA1, SHA256, SHA512) (default "SHA1")
+ -i, --period int   period of calculate otp for TOTP (default 30)
+ -l, --digits int   otp length for HOTP (default 6)
+ -c, --counter int  number of iterations count for HOTP
 ```
 
 ## Examples
@@ -93,12 +93,6 @@ List accounts whose issuer is GitHub and whose user is ozgur-yalcin
 mfa list GitHub:ozgur-yalcin
 ```
 
-List accounts whose issuer is GitHub and whose user is ozgur-yalcin
-
-```
-mfa list GitHub ozgur-yalcin
-```
-
 ### Delete accounts
 
 Delete all accounts named GitHub
@@ -107,10 +101,10 @@ Delete all accounts named GitHub
 mfa del GitHub
 ```
 
-Delete accounts  whose issuer is GitHub and whose user is ozgur-yalcin
+Delete accounts whose issuer is GitHub and whose user is ozgur-yalcin
 
 ```
-mfa del GitHub ozgur-yalcin
+mfa del GitHub:ozgur-yalcin
 ```
 
 ### Update account
