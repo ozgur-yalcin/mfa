@@ -114,16 +114,27 @@ func (c *updateCommand) updateAccount(accountName string, userName string, secre
 		log.Fatal(err)
 	}
 	defer db.Close()
-	account := db.RetrieveFirstAccount(accountName, userName)
-	account.AccountName = accountName
-	account.Username = userName
-	account.SecretKey = secretKey
-	account.Mode = c.mode
-	account.Base32 = c.base32
-	account.Hash = c.hash
-	account.ValueLength = c.valueLength
-	account.Counter = c.counter
-	account.Epoch = c.epoch
-	account.Interval = c.interval
-	return db.SaveAccount(account)
+	accounts, err := db.ListAccounts(accountName, userName)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if len(accounts) == 0 {
+		log.Fatal("account not found")
+	} else if len(accounts) > 1 {
+		log.Fatal("multiple accounts found")
+	} else if len(accounts) == 1 {
+		account := db.RetrieveFirstAccount(accountName, userName)
+		account.AccountName = accountName
+		account.Username = userName
+		account.SecretKey = secretKey
+		account.Mode = c.mode
+		account.Base32 = c.base32
+		account.Hash = c.hash
+		account.ValueLength = c.valueLength
+		account.Counter = c.counter
+		account.Epoch = c.epoch
+		account.Interval = c.interval
+		return db.SaveAccount(account)
+	}
+	return nil
 }
