@@ -118,7 +118,7 @@ func (c *qrCommand) Run(ctx context.Context, cd *Ancestor, args []string) error 
 	if counter := u.Query().Get("counter"); counter != "" && account.Mode == "hotp" {
 		fmt.Sscanf(counter, "%d", &account.Counter)
 	}
-	if err := c.setAccount(account); err != nil {
+	if err := c.addAccount(account); err != nil {
 		log.Fatal(err)
 	}
 	log.Println("account added successfully")
@@ -145,7 +145,7 @@ func (c *qrCommand) readQRCode(path string) (*lib.Result, error) {
 	return reader.Decode(bitmap, nil)
 }
 
-func (c *qrCommand) setAccount(account *models.Account) error {
+func (c *qrCommand) addAccount(account *models.Account) error {
 	db, err := database.LoadDatabase()
 	if err != nil {
 		log.Fatal(err)
