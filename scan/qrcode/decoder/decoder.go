@@ -50,7 +50,6 @@ func (this *Decoder) Decode(bits *scan.BitMatrix, hints map[scan.DecodeHintType]
 	case scan.FormatException, scan.ChecksumException:
 		fece = e.(scan.ReaderException)
 	}
-	e = nil
 
 	// Revert the bit matrix
 	parser.Remask()
@@ -58,10 +57,8 @@ func (this *Decoder) Decode(bits *scan.BitMatrix, hints map[scan.DecodeHintType]
 	// Will be attempting a mirrored reading of the version and format info.
 	parser.SetMirror(true)
 
-	if e == nil {
-		// Preemptively read the version.
-		_, e = parser.ReadVersion()
-	}
+	// Preemptively read the version.
+	_, e = parser.ReadVersion()
 
 	if e == nil {
 		// Preemptively read the format information.
