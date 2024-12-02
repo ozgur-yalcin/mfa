@@ -20,14 +20,14 @@ func (r *rootCommand) Name() string {
 	return r.name
 }
 
-func (r *rootCommand) Init(cd *Ancestor) error {
+func (r *rootCommand) Init(cd *Ancestor) (err error) {
 	r.fs = flag.NewFlagSet(r.name, flag.ExitOnError)
-	return nil
+	return
 }
 
-func (r *rootCommand) Run(ctx context.Context, cd *Ancestor, args []string) error {
+func (r *rootCommand) Run(ctx context.Context, cd *Ancestor, args []string) (err error) {
 	slog.Debug(fmt.Sprintf("mfa version %q finishing with parameters %q", initialize.Version, os.Args))
-	return nil
+	return
 }
 
 func (r *rootCommand) Commands() []Commander {
@@ -56,7 +56,7 @@ func (r *Exec) Execute(ctx context.Context, args []string) (*Ancestor, error) {
 	return cd, nil
 }
 
-func Execute(args []string) error {
+func Execute(args []string) (err error) {
 	x, err := newExec()
 	if err != nil {
 		return err

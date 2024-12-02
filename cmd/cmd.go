@@ -39,7 +39,7 @@ func newExec() (*Exec, error) {
 	})
 }
 
-func (c *Ancestor) init() error {
+func (c *Ancestor) init() (err error) {
 	var ancestors []*Ancestor
 	{
 		cd := c
@@ -48,10 +48,10 @@ func (c *Ancestor) init() error {
 			cd = cd.Parent
 		}
 	}
-	return nil
+	return
 }
 
-func (c *Ancestor) run() error {
+func (c *Ancestor) run() (err error) {
 	c.Command = flag.NewFlagSet(c.Commander.Name(), flag.ContinueOnError)
 	if err := c.Commander.Init(c); err != nil {
 		return err
@@ -61,5 +61,5 @@ func (c *Ancestor) run() error {
 			return err
 		}
 	}
-	return nil
+	return
 }

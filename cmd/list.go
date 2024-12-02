@@ -36,12 +36,12 @@ func (c *listCommand) Commands() []Commander {
 	return c.commands
 }
 
-func (c *listCommand) Init(cd *Ancestor) error {
+func (c *listCommand) Init(cd *Ancestor) (err error) {
 	c.fs = flag.NewFlagSet(c.name, flag.ExitOnError)
-	return nil
+	return
 }
 
-func (c *listCommand) Run(ctx context.Context, cd *Ancestor, args []string) error {
+func (c *listCommand) Run(ctx context.Context, cd *Ancestor, args []string) (err error) {
 	initialize.Init()
 	if err := c.fs.Parse(args); err != nil {
 		return err
@@ -59,10 +59,10 @@ func (c *listCommand) Run(ctx context.Context, cd *Ancestor, args []string) erro
 	if err := c.listAccounts(issuer, user); err != nil {
 		return err
 	}
-	return nil
+	return
 }
 
-func (c *listCommand) listAccounts(issuer string, user string) error {
+func (c *listCommand) listAccounts(issuer string, user string) (err error) {
 	db, err := database.LoadDatabase()
 	if err != nil {
 		return err
@@ -115,5 +115,5 @@ func (c *listCommand) listAccounts(issuer string, user string) error {
 		}
 		writer.Flush()
 	}
-	return nil
+	return
 }

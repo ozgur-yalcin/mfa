@@ -30,12 +30,12 @@ func (c *delCommand) Commands() []Commander {
 	return c.commands
 }
 
-func (c *delCommand) Init(cd *Ancestor) error {
+func (c *delCommand) Init(cd *Ancestor) (err error) {
 	c.fs = flag.NewFlagSet(c.name, flag.ExitOnError)
-	return nil
+	return
 }
 
-func (c *delCommand) Run(ctx context.Context, cd *Ancestor, args []string) error {
+func (c *delCommand) Run(ctx context.Context, cd *Ancestor, args []string) (err error) {
 	initialize.Init()
 	if err := c.fs.Parse(args); err != nil {
 		return err
@@ -54,10 +54,10 @@ func (c *delCommand) Run(ctx context.Context, cd *Ancestor, args []string) error
 		return err
 	}
 	log.Println("accounts deleted successfully")
-	return nil
+	return
 }
 
-func (c *delCommand) delAccount(issuer string, user string) error {
+func (c *delCommand) delAccount(issuer string, user string) (err error) {
 	db, err := database.LoadDatabase()
 	if err != nil {
 		return err
@@ -75,5 +75,5 @@ func (c *delCommand) delAccount(issuer string, user string) error {
 	} else if len(accounts) > 0 {
 		return db.DelAccount(issuer, user)
 	}
-	return nil
+	return
 }

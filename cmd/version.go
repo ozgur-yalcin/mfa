@@ -27,14 +27,14 @@ func (c *versionCommand) Commands() []Commander {
 	return c.commands
 }
 
-func (c *versionCommand) Init(cd *Ancestor) error {
+func (c *versionCommand) Init(cd *Ancestor) (err error) {
 	c.fs = flag.NewFlagSet(c.name, flag.ExitOnError)
-	return nil
+	return
 }
 
-func (c *versionCommand) Run(ctx context.Context, cd *Ancestor, args []string) error {
+func (c *versionCommand) Run(ctx context.Context, cd *Ancestor, args []string) (err error) {
 	c.ShowVersion()
-	return nil
+	return
 }
 
 func (c *versionCommand) ShowVersion() {

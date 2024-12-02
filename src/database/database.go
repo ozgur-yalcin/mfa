@@ -17,9 +17,8 @@ type Database struct {
 	backend backend.Backend
 }
 
-func (db *Database) Open() error {
+func (db *Database) Open() (err error) {
 	var conn *gorm.DB
-	var err error
 	switch db.backend.Engine() {
 	case "sqlite":
 		params := db.backend.Params()
@@ -34,10 +33,10 @@ func (db *Database) Open() error {
 		return err
 	}
 	db.db = conn
-	return nil
+	return
 }
 
-func (db *Database) Close() error {
+func (db *Database) Close() (err error) {
 	client, err := db.db.DB()
 	if err != nil {
 		return err
@@ -53,6 +52,6 @@ func (db *Database) Engine() string {
 	return db.backend.Engine()
 }
 
-func (db *Database) AutoMigrate(dst ...interface{}) error {
+func (db *Database) AutoMigrate(dst ...interface{}) (err error) {
 	return db.db.AutoMigrate(dst...)
 }

@@ -5,7 +5,7 @@ import (
 	"github.com/ozgur-yalcin/mfa/src/models"
 )
 
-func DB() error {
+func DB() (err error) {
 	db, err := database.LoadDatabase()
 	if err != nil {
 		return err
@@ -14,10 +14,9 @@ func DB() error {
 		return err
 	}
 	defer db.Close()
-
 	err = db.AutoMigrate(&models.Account{})
 	if err != nil {
 		return err
 	}
-	return nil
+	return
 }

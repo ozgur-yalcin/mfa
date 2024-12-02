@@ -36,7 +36,7 @@ func (c *setCommand) Commands() []Commander {
 	return c.commands
 }
 
-func (c *setCommand) Init(cd *Ancestor) error {
+func (c *setCommand) Init(cd *Ancestor) (err error) {
 	c.fs = flag.NewFlagSet(c.name, flag.ExitOnError)
 	c.fs.StringVar(&c.mode, "mode", "totp", "use time-variant TOTP mode or use event-based HOTP mode")
 	c.fs.StringVar(&c.mode, "m", "totp", "use time-variant TOTP mode or use event-based HOTP mode (shorthand)")
@@ -48,10 +48,10 @@ func (c *setCommand) Init(cd *Ancestor) error {
 	c.fs.Int64Var(&c.counter, "c", 0, "used for HOTP, A counter C, which counts the number of iterations (shorthand)")
 	c.fs.Int64Var(&c.period, "period", 30, "used for TOTP, an period (Tx) which will be used to calculate the value of the counter CT")
 	c.fs.Int64Var(&c.period, "i", 30, "used for TOTP, an period (Tx) which will be used to calculate the value of the counter CT (shorthand)")
-	return nil
+	return
 }
 
-func (c *setCommand) Run(ctx context.Context, cd *Ancestor, args []string) error {
+func (c *setCommand) Run(ctx context.Context, cd *Ancestor, args []string) (err error) {
 	initialize.Init()
 	if err := c.fs.Parse(args); err != nil {
 		return err
@@ -78,7 +78,7 @@ func (c *setCommand) Run(ctx context.Context, cd *Ancestor, args []string) error
 		return err
 	}
 	log.Println("account updated successfully")
-	return nil
+	return
 }
 
 func (c *setCommand) generateCode(secret string) (code string, err error) {
@@ -97,7 +97,7 @@ func (c *setCommand) generateCode(secret string) (code string, err error) {
 	return
 }
 
-func (c *setCommand) setAccount(issuer string, user string, secret string) error {
+func (c *setCommand) setAccount(issuer string, user string, secret string) (err error) {
 	db, err := database.LoadDatabase()
 	if err != nil {
 		return err
@@ -126,5 +126,5 @@ func (c *setCommand) setAccount(issuer string, user string, secret string) error
 		account.Period = c.period
 		return db.SetAccount(account)
 	}
-	return nil
+	return
 }

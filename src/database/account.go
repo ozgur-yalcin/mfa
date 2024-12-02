@@ -9,11 +9,11 @@ func (db *Database) ListAccounts(issuer string, user string) (accounts []models.
 	return
 }
 
-func (db *Database) AddAccount(account *models.Account) error {
+func (db *Database) AddAccount(account *models.Account) (err error) {
 	return db.db.Create(account).Error
 }
 
-func (db *Database) DelAccount(issuer string, user string) error {
+func (db *Database) DelAccount(issuer string, user string) (err error) {
 	return db.db.Where(&models.Account{Issuer: issuer, User: user}).Delete(&models.Account{}).Error
 }
 
@@ -22,6 +22,6 @@ func (db *Database) GetAccount(issuer string, user string) (account models.Accou
 	return
 }
 
-func (db *Database) SetAccount(account models.Account) error {
+func (db *Database) SetAccount(account models.Account) (err error) {
 	return db.db.Save(&account).Error
 }
