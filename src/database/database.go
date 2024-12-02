@@ -52,6 +52,6 @@ func (db *Database) Engine() string {
 	return db.backend.Engine()
 }
 
-func (db *Database) AutoMigrate(dst ...interface{}) (err error) {
+func (db *Database) AutoMigrate(dst ...any) (err error) {
 	return db.db.AutoMigrate(dst...)
 }
