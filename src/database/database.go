@@ -1,7 +1,7 @@
 package database
 
 import (
-	"log"
+	"errors"
 	"sync"
 
 	"github.com/ozgur-yalcin/mfa/src/backend"
@@ -28,7 +28,7 @@ func (db *Database) Open() error {
 		params := db.backend.Params()
 		conn, err = gorm.Open(postgres.Open(params), &gorm.Config{})
 	default:
-		log.Fatalf("not supported database engine: %s", db.backend.Engine())
+		return errors.New("not supported database engine")
 	}
 	if err != nil {
 		return err
@@ -40,7 +40,7 @@ func (db *Database) Open() error {
 func (db *Database) Close() error {
 	client, err := db.db.DB()
 	if err != nil {
-		log.Fatalln(err)
+		return err
 	}
 	return client.Close()
 }
