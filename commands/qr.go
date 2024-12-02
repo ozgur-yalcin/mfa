@@ -65,8 +65,8 @@ func (c *qrCommand) Run(ctx context.Context, cd *Ancestor, args []string) error 
 	if err := c.fs.Parse(args); err != nil {
 		return err
 	}
-	imagePath := c.fs.Arg(0)
-	otpauth, err := c.readQRCode(imagePath)
+	path := c.fs.Arg(0)
+	otpauth, err := c.readQRCode(path)
 	if err != nil {
 		return err
 	}
@@ -120,14 +120,14 @@ func (c *qrCommand) Run(ctx context.Context, cd *Ancestor, args []string) error 
 	return nil
 }
 
-func (c *qrCommand) readQRCode(imagePath string) (*gozxing.Result, error) {
-	file, err := os.Open(imagePath)
+func (c *qrCommand) readQRCode(path string) (*gozxing.Result, error) {
+	file, err := os.Open(path)
 	if err != nil {
 		return nil, err
 	}
 	defer file.Close()
 	var img gozxing.LuminanceSource
-	ext := strings.ToLower(filepath.Ext(imagePath))
+	ext := strings.ToLower(filepath.Ext(path))
 	switch ext {
 	case ".jpg", ".jpeg":
 		img_obj, err := jpeg.Decode(file)
