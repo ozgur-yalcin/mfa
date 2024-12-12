@@ -4,7 +4,7 @@ go 1.23.1
 
 require (
 	golang.org/x/image v0.22.0
-	golang.org/x/text v0.20.0
+	golang.org/x/text v0.21.0
 	golang.org/x/xerrors v0.0.0-20240903120638-7835f813f4da
 	gorm.io/driver/postgres v1.5.10
 	gorm.io/driver/sqlite v1.5.6
@@ -19,6 +19,6 @@ require (
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/mattn/go-sqlite3 v1.14.24 // indirect
-	golang.org/x/crypto v0.29.0 // indirect
-	golang.org/x/sync v0.9.0 // indirect
+	golang.org/x/crypto v0.31.0 // indirect
+	golang.org/x/sync v0.10.0 // indirect
 )
